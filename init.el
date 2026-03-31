@@ -140,9 +140,9 @@
 
 
 
-(use-package all-the-icons-completion
+(use-package nerd-icons-completion
   :straight t
-  :after all-the-icons
-  :init
-  (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup)
-  (all-the-icons-completion-mode))
+  :after nerd-icons
+  :config
+  (nerd-icons-completion-mode)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
