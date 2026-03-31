@@ -30,7 +30,30 @@
   :after all-the-icons nerd-icons
   :init (doom-modeline-mode 1))
 
+(use-package doom-themes
+  :straight t
+  :custom
+  (doom-themes-enabe bold t)    ; if nil, bold is universally disabled
+  (doom-themes enable-italic t) ; if nil, italics are universally disabled
 
+  ;; use "doom-atom" for less minimal icon theme
+  (doom-themes-treemacs-theme "doom-atom")
+
+  :config
+  (load-theme 'doom-one t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  
+  ;; Enable custom neotree theme (nerd-icons must be installed)
+  (doom-themes-neotree-config)
+  
+  ;; Corrects (and improves) org-mode's native fontification
+  (doom-themes-org-config))
+
+
+;; Set transparency for all new frames
+(add-to-list 'default-frame-alist '(alpha-background . 70))
 
 ;;; Completion
 
