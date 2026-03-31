@@ -23,10 +23,7 @@
   :if (display-graphic-p))
 
 (use-package nerd-icons
-  :straight t
-  :init
-  (when (display-graphic-p)
-    (add-hook 'after-init-hook #'nerd-icons-install-fonts)))
+  :straight t)
 
 (use-package doom-modeline
   :straight t

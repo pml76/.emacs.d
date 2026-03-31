@@ -15,6 +15,9 @@ to install do:
      git clone https://github.com/radian-software/straight.el.git
      cd ../..
 
+   - when on windows, install the fonts located at
+     ...\.emacs.d\straight\repos\nerd-icons.el\fonts\*
+
 
 done ;)
 
