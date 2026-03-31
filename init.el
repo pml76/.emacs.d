@@ -1,3 +1,5 @@
+;; Package Manager Setup -------------------------------------------------------
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name
@@ -16,7 +18,20 @@
 
 (straight-use-package 'use-package)
 
-;;; GUI
+;; Basic UI Configuration ------------------------------------------------------
+
+(defvar runemacs/default-font-size 180)
+
+(setq inhibit-startup-message t)
+
+(scroll-bar-mode -1)        ; Disable visible scrollbar
+(tool-bar-mode -1)          ; Disable the toolbar
+(tooltip-mode -1)           ; Disable tooltips
+(set-fringe-mode 10)        ; Give some breathing room
+
+(menu-bar-mode -1)          ; Disable the menu bar
+
+;; Advanced UI Configuration --------------------------------------------------
 
 (use-package all-the-icons
   :straight t
@@ -51,9 +66,16 @@
   ;; Corrects (and improves) org-mode's native fontification
   (doom-themes-org-config))
 
+;; Font Configuration ----------------------------------------------------------
 
-;; Set transparency for all new frames
-(add-to-list 'default-frame-alist '(alpha-background . 70))
+(set-face-attribute 'default nil :font "Fira Code" :height runemacs/default-font-size)
+
+;; Set the fixed pitch face
+(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 260)
+
+;; Set the variable pitch face
+(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 295 :weight 'regular)
+
 
 ;;; Completion
 
