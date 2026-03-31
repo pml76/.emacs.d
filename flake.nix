@@ -7,8 +7,8 @@
 
   outputs = { self, nixpkgs }: {
   
-    emacs-init-el = ./init.el
-    emacs-early-init-el = ./early-init.el
+    emacs-init-el = ./init.el;
+    emacs-early-init-el = ./early-init.el;
 
   };
 }
