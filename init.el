@@ -31,6 +31,15 @@
 
 (menu-bar-mode -1)          ; Disable the menu bar
 
+(set-frame-parameter nil 'alpha-background 70) 
+(add-to-list 'default-frame-alist '(alpha-background . 70))
+
+;; Set transparency for the current frame
+(set-frame-parameter (selected-frame) 'alpha '(95 50))
+
+;; Apply this setting to all new frames
+(add-to-list 'default-frame-alist '(alpha 95 50))   
+
 ;; Advanced UI Configuration --------------------------------------------------
 
 (use-package all-the-icons
