@@ -16,6 +16,27 @@
 
 (straight-use-package 'use-package)
 
+;;; GUI
+
+(use-package all-the-icons
+  :straight t
+  :if (display-graphic-p))
+
+(use-package nerd-icons
+  :straight t
+  :init
+  (when (display-graphic-p)
+    (add-hook 'after-init-hook #'nerd-icons-install-fonts)))
+
+(use-package doom-modeline
+  :straight t
+  :after all-the-icons nerd-icons
+  :init (doom-modeline-mode 1))
+
+
+
+;;; Completion
+
 (use-package vertico
   :straight t
   :custom
@@ -75,9 +96,6 @@
   (completion-pcm-leading-wildcard t))
 
 
-(use-package all-the-icons
-  :straight t
-  :if (display-graphic-p))
 
 
 (use-package all-the-icons-completion
