@@ -31,6 +31,33 @@
 
 (menu-bar-mode -1)          ; Disable the menu bar
 
+
+;; Font Configuration ----------------------------------------------------------
+
+(defun pl/set-font-faces ()
+  (message "Setting faces!")
+  ;(set-face-attribute 'default nil :font "JetBrains Mono" :weight 'light :height 180)
+  ;(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 190)
+  ;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :weight 'light :height 1.3)
+  (set-face-attribute 'default nil :font "Fira Code" :height runemacs/default-font-size)
+
+  ;; Set the fixed pitch face
+  (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 260)
+  
+  ;; Set the variable pitch face
+  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 295 :weight 'regular))
+
+(defun pl/set-transparency ()
+  ;; set the alpha values for the window...
+  ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
+  ;;(set-frame-parameter (selected-frame) 'alpha <both>)
+  (set-frame-parameter (selected-frame) 'alpha '(97 . 100))
+  (add-to-list 'default-frame-alist '(alpha . (90 . 90))))
+
+(defun pl/setup-gui ()
+  (pl/set-font-faces)
+  (pl/set-transparency))
+
 (pcase system-type
   (gnu/linux (progn
 	       (message "Running on GNU/Linux")
@@ -45,6 +72,14 @@
 		(add-to-list 'default-frame-alist '(alpha 95 50))))
   (_         (message "Unknown operating system")))
 
+(if (daemonp)
+    (add-hook 'after-make-frame-functions
+	      (lambda (frame)
+		;; (setq doom-modeline-icon t)
+		(with-selected-frame frame
+		  (pl/setup-gui)
+		  )))
+  (pl/setup-gui))
 
 
 ;; Advanced UI Configuration --------------------------------------------------
@@ -82,15 +117,6 @@
   ;; Corrects (and improves) org-mode's native fontification
   (doom-themes-org-config))
 
-;; Font Configuration ----------------------------------------------------------
-
-(set-face-attribute 'default nil :font "Fira Code" :height runemacs/default-font-size)
-
-;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 260)
-
-;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 295 :weight 'regular)
 
 
 ;; Utilities -------------------------------------------------------------------
