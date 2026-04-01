@@ -48,29 +48,21 @@
   (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 295 :weight 'regular))
 
 (defun pl/set-transparency ()
-  ;; set the alpha values for the window...
-  ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
-  ;;(set-frame-parameter (selected-frame) 'alpha <both>)
-  (set-frame-parameter (selected-frame) 'alpha '(97 . 100))
-  (add-to-list 'default-frame-alist '(alpha . (90 . 90))))
+  (cond
+   ((eq system-type 'windows-nt)
+    (set-frame-parameter (selected-frame) 'alpha '(97 . 100))
+    (add-to-list 'default-frame-alist '(alpha . (97 . 100)))
+    (message "Running on Windows"))
+   ((eq system-type 'gnu/linux)
+    (set-frame-parameter nil 'alpha-background 85) 
+    (add-to-list 'default-frame-alist '(alpha-background . 85))
+    (message "Running on GNU/Linux"))
+   (t
+    (message "Unknown operating system"))))
 
 (defun pl/setup-gui ()
   (pl/set-font-faces)
   (pl/set-transparency))
-
-(pcase system-type
-  (gnu/linux (progn
-	       (message "Running on GNU/Linux")
-	       (set-frame-parameter nil 'alpha-background 85) 
-	       (add-to-list 'default-frame-alist '(alpha-background . 85))))
-  (windows-nt (progn
-		(message "Running on Windows")
-	        ;; Set transparency for the current frame
-		(set-frame-parameter (selected-frame) 'alpha '(95 50))
-
-		;; Apply this setting to all new frames
-		(add-to-list 'default-frame-alist '(alpha 95 50))))
-  (_         (message "Unknown operating system")))
 
 (if (daemonp)
     (add-hook 'after-make-frame-functions
