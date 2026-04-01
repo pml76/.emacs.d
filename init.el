@@ -50,12 +50,12 @@
 (defun pl/set-transparency ()
   (cond
    ((eq system-type 'windows-nt)
-    (set-frame-parameter (selected-frame) 'alpha '(97 . 100))
-    (add-to-list 'default-frame-alist '(alpha . (97 . 100)))
+    (set-frame-parameter (selected-frame) 'alpha '(95 . 100))
+    (add-to-list 'default-frame-alist '(alpha . (95 . 100)))
     (message "Running on Windows"))
    ((eq system-type 'gnu/linux)
-    (set-frame-parameter nil 'alpha-background 85) 
-    (add-to-list 'default-frame-alist '(alpha-background . 85))
+    (set-frame-parameter nil 'alpha-background 95) 
+    (add-to-list 'default-frame-alist '(alpha-background . 95))
     (message "Running on GNU/Linux"))
    (t
     (message "Unknown operating system"))))
