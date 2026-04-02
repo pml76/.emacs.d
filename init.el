@@ -355,6 +355,13 @@
 (use-package projectile
   :straight t)
 
+;; nix-mode ------------------------------------------------------------
+
+(use-package nix-mode
+  :straight t
+  :mode "\\.nix\\'")
+
+
 ;; lsp-mode ------------------------------------------------------------
 
 (use-package lsp-mode
