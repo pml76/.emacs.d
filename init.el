@@ -378,5 +378,10 @@
   :straight t
   :commands lsp-ui-mode)
 
+(use-package flycheck
+  :straight t
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
+
 (use-package dap-mode
   :straight t)
