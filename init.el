@@ -362,5 +362,13 @@
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-c l")
-  :config
-  (lsp-enable-which-key-integration t))
+  :hook ((c++-mode . lsp) 
+	 (lsp-mode . lsp-enable-which-key-integration)) 
+  :commands lsp)
+
+(use-package lsp-ui
+  :straight t
+  :commands lsp-ui-mode)
+
+(use-package dap-mode
+  :straight t)
