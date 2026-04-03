@@ -584,7 +584,7 @@
 (use-package dap-mode
   :straight t
   :init
-  (require dap-lldb)
+  (require 'dap-lldb)
   (setq dap-lldb-debug-program "lldb-dap"))
 
 ;;; init.el ends here
