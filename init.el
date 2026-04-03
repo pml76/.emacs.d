@@ -583,3 +583,8 @@
 
 (use-package dap-mode
   :straight t)
+
+(use-package dap-lldb
+  :straight t)
+
+;;; init.el ends here
