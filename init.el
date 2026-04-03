@@ -588,4 +588,12 @@
 
 (setq dap-lldb-debug-program "/nix/store/36nkrg75gkb1rrjys56a6yvi0n8bqxmy-home-manager-path/bin/lldb-dap")
 
+(dap-register-debug-template "My LLDB Configuration"
+			     (list
+			      :type "lldb"
+			      :request "launch"
+			      :name "LLDB::Run"
+			      :target nil
+			      :cwd nil))
+
 ;;; init.el ends here
