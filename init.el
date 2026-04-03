@@ -151,7 +151,7 @@
 
 
 
-;;; Completion
+;; Vertico & assocated packages ------------------------------------------
 
 (use-package vertico
   :straight t
@@ -167,22 +167,6 @@
   :straight t
   :init
   (savehist-mode))
-
-(use-package emacs
-  :straight t
-  :custom
-  ;; Enable context menu. `vertico-multiform-mode´ adds a menu in the minibuf
-  ;; to switch display modes.
-  (context-menu-mode t)
-  ;; Support opening new minibuffers from inside existing minibuffers.
-  (enable-recursive-minibuffers t)
-  ;; Hide command in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers. This setting is useful
-  ;; beyond Vertico
-  (read-extended-command-predicate #'command-completion-default-include-p)
-  ;; Do not allow the cursor in the minibuffer prompt
-  (minibuffer-prompt-properties
-   '(read-only t cursor-intangible t face minibuffer-prompt)))
 
 (use-package marginalia
   :straight t
@@ -218,6 +202,81 @@
   :config
   (nerd-icons-completion-mode)
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+(use-package corfu
+  :straight t
+  ;; Optional customizations
+  ;; :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match 'insert) ;; Configure handling of exact matches
+
+  ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  :init
+
+  ;; Recommended: Enable Corfu globally.  Recommended since many modes provide
+  ;; Capfs and Dabbrev can be used globally (M-/).  See also the customization
+  ;; variable `global-corfu-modes' to exclude certain modes.
+  (global-corfu-mode)
+
+  ;; Enable optional extension modes:
+  ;; (corfu-history-mode)
+  ;; (corfu-popupinfo-mode)
+  )
+
+;; Use Dabbrev with Corfu!
+(use-package dabbrev
+  :straight t
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+  (add-to-list 'dabbrev-ignored-buffer-modes 'authinfo-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
+
+;; A few more useful configurations...
+(use-package emacs
+  :straight t
+  :custom
+  ;; Enable context menu. `vertico-multiform-mode´ adds a menu in the minibuf
+  ;; to switch display modes.
+  (context-menu-mode t)
+  ;; Support opening new minibuffers from inside existing minibuffers.
+  (enable-recursive-minibuffers t)
+  ;; Hide command in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers. This setting is useful
+  ;; beyond Vertico
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  ;; Do not allow the cursor in the minibuffer prompt
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt))
+  
+  ;; TAB cycle if there are only few candidates
+  ;; (completion-cycle-threshold 3)
+  
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (tab-always-indent 'complete)
+  
+  ;; Emacs 30 and newer: Disable Ispell completion function.
+  ;; Try `cape-dict' as an alternative.
+  (text-mode-ispell-word-completion nil)
+  
+  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
+  ;; commands are hidden, since they are not used via M-x. This setting is
+  ;; useful beyond Corfu.
+  (read-extended-command-predicate #'command-completion-default-include-p))
+
 
 (use-package consult
   :straight t
@@ -274,7 +333,7 @@
          ;; Minibuffer history
          :map minibuffer-local-map
          ("M-s" . consult-history) ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+         ("M-r" . consult-history)) ;; orig. previous-matching-history-element
 
   ;; The :init configuration is always executed (Not lazy)
   :init
@@ -317,7 +376,7 @@
   ;; Optionally make narrowing help available in the minibuffer.
   ;; You may want to use `embark-prefix-help-command' or which-key instead.
   ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
-)
+  )
 
 ;; Treemacs --------------------------------------------------------------------
 
@@ -466,13 +525,21 @@
 
 (use-package lsp-mode
   :straight t
-  :commands (lsp lsp-deferred)
+  :custom
+  (lsp-completion-provider :none) ;; we use Corfu!
   :init
   (setq lsp-keymap-prefix "C-c l")
-  :hook ((c++-mode . lsp)
-	 (nix-mode . lsp)
-	 (lsp-mode . lsp-enable-which-key-integration)) 
-  :commands lsp)
+
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(flex))) ;; Configure flex
+  
+  :hook
+  ((lsp-completion-mode . my/lsp-mode-setup-completion)
+   (c++-mode . lsp)
+   (nix-mode . lsp)
+   (lsp-mode . lsp-enable-which-key-integration))
+  :commands (lsp lsp-deferred))
 
 (use-package lsp-ui
   :straight t
