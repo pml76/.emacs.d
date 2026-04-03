@@ -546,6 +546,11 @@
 
 ;; lsp-mode ------------------------------------------------------------
 
+(defun pl/lsp-mode-setup ()
+    (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+
 (use-package lsp-mode
   :straight t
   :custom
@@ -555,10 +560,10 @@
 
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(flex))) ;; Configure flex
-  
+          '(flex))) ;; Configure flex  
   :hook
-  ((lsp-completion-mode . my/lsp-mode-setup-completion)
+  ((lsp-mode . pl/lsp-mode-setup)
+   (lsp-completion-mode . my/lsp-mode-setup-completion)
    (c++-mode . lsp)
    (nix-mode . lsp)
    (lsp-mode . lsp-enable-which-key-integration))
