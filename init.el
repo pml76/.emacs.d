@@ -584,10 +584,10 @@
 (use-package dap-mode
   :straight t
   :config
-;  (require 'dap-gdb)
-;  (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
-;  
-;
+
+  ;; (require 'dap-gdb)
+  ;; (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
+  ;;
   ;; (dap-register-debug-template
   ;;  "GDB::Run"
   ;;  (list :type "gdb"
@@ -599,6 +599,15 @@
   ;; 	 ))
   
   (require 'dap-lldb)
-  (setq dap-lldb-debug-program '("lldb-dap")))
+  (setq dap-lldb-debug-program '("lldb-dap"))
+  ;; (dap-register-debug-template
+  ;;  "LLDB::Run"
+  ;;  (list :type "lldb-vscode"
+  ;;        :cwd "/home/peter/tmp/"
+  ;;        :request "launch"
+  ;;        :program "/home/peter/tmp/a.out"
+  ;;        :name "LLDB::Run"))
+
+  )
 
 ;;; init.el ends here
