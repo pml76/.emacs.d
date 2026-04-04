@@ -584,9 +584,21 @@
 (use-package dap-mode
   :straight t
   :config
-  (require 'dap-gdb)
-  (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
-  ;(setq dap-lldb-debug-program "lldb-dap")
-  )
+;  (require 'dap-gdb)
+;  (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
+;  
+;
+  ;; (dap-register-debug-template
+  ;;  "GDB::Run"
+  ;;  (list :type "gdb"
+  ;;        :request "launch"
+  ;;        :name "GDB::Run"
+  ;;        :target nil
+  ;; 	 :program "/home/peter/tmp/a.out"
+  ;;        :cwd "/home/peter/tmp/"
+  ;; 	 ))
+  
+  (require 'dap-lldb)
+  (setq dap-lldb-debug-program '("lldb-dap")))
 
 ;;; init.el ends here
