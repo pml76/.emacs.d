@@ -584,7 +584,8 @@
 (use-package dap-mode
   :straight t
   :config
-  (require 'dap-cpptools)
+  (require 'dap-gdb)
+  (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
   ;(setq dap-lldb-debug-program "lldb-dap")
   )
 
