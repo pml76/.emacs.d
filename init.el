@@ -565,9 +565,16 @@
   ((lsp-mode . pl/lsp-mode-setup)
    (lsp-completion-mode . my/lsp-mode-setup-completion)
    (c++-mode . lsp)
+   (c-mode . lsp)
    (nix-mode . lsp)
    (lsp-mode . lsp-enable-which-key-integration))
   :commands (lsp lsp-deferred))
+
+(use-package ccls
+  :straight t
+  :config
+  (setq ccls-executable "ccls")
+  :hook ((c-mode c++-mode) . (lambda () (require 'ccls) (lsp) )))
 
 (use-package lsp-ui
   :straight t
