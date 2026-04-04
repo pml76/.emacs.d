@@ -3,3 +3,6 @@ straight/
 history
 auto-save-list/
 .cache/
+server/
+transient/
+projectile-bookmarks.eld
