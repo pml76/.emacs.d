@@ -581,11 +581,17 @@
    (lsp-mode . lsp-enable-which-key-integration))
   :commands (lsp lsp-deferred))
 
-(use-package ccls
-  :straight t
-  :config
-  (setq ccls-executable "ccls")
-  :hook ((c-mode c++-mode) . (lambda () (require 'ccls) (lsp) )))
+
+(defun pl/when-linux-install ()
+  (cond
+   ((use-package ccls
+      :straight t
+      :config
+      (setq ccls-executable "ccls")
+      :hook ((c-mode c++-mode) . (lambda () (require 'ccls) (lsp) )))
+    (message "setup ccls"))))
+
+(pl/when-linux-install)
 
 (use-package lsp-ui
   :straight t
