@@ -530,7 +530,9 @@
 ;; magit ---------------------------------------------------------------
 
 (use-package magit
-  :straight t)
+  :straight t
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
 ;; projectile ----------------------------------------------------------
 
