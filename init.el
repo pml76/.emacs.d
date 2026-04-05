@@ -636,5 +636,9 @@
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
 
+(use-package org
+  :straight t)
+
+
 
 ;;; init.el ends here
