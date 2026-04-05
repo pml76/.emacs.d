@@ -17,7 +17,9 @@
       overlays = [ (import emacs-overlay) ];
     };
     emacs-fields = {
-      name = "Configured Emacs";
+      name = pkgs.emacs-unstable-pgtk.name; 
+      src = pkgs.emacs-unstable-pgtk.src;
+      
       buildInputs = with pkgs; [
         emacs-unstable-pgtk
         gcc
@@ -52,7 +54,10 @@
         emacs-all-the-icons-fonts
         
       ] # nerd-fonts
-      ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+      ++ (builtins.filter
+        lib.attrsets.isDerivation
+        (builtins.attrValues pkgs.nerd-fonts))
+      ++ pkgs.emacs-unstable-pgtk.buildInputs;
     };
       
   in{
