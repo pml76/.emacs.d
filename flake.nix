@@ -57,6 +57,8 @@
     emacs-init-el = ./init.el;
     emacs-early-init-el = ./early-init.el;
 
+    emacs = pkgs.emacs-unstable-pgtk;
+
     emacs-additional-packages = emacs-additional-packages;
     
     devShells.x86_64-linux.default = pkgs.mkShell {
