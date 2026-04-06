@@ -17,7 +17,7 @@
       overlays = [ (import emacs-overlay) ];
     };
     emacs-additional-packages = with pkgs; [
-      gcc
+      # gcc
       
       # used by emacs
       ripgrep
