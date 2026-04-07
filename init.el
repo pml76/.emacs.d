@@ -535,6 +535,8 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
+(setenv "GIT_ASKPASS" "git-gui--askpass")
+
 ;; projectile ----------------------------------------------------------
 
 (use-package projectile
