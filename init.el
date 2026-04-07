@@ -585,12 +585,6 @@
       :straight t
       :mode "\\.nix\\'")
 
-    (use-package ccls
-      :straight t
-      :config
-      (setq ccls-executable "ccls")
-      :hook ((c-mode c++-mode) . (lambda () (require 'ccls) (lsp) )))
-
     (use-package dap-mode
       :straight t
       :config
@@ -619,7 +613,7 @@
       ;;        :name "LLDB::Run"))
       
       )
-    (message "setup ccls"))))
+    )))
 
 (pl/when-linux-install)
 
@@ -644,5 +638,16 @@
 (global-set-key (kbd "C-c l") #'org-store-link)
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
+
+(require 'treesit)
+
+(treesit-language-available-p 'rust)
+(treesit-language-available-p 'cpp)
+
+
+(setq major-mode-remap-alist
+      '((cpp-mode . cpp-ts-mode)
+	(rust-mode . rust-ts-mode)))
+
 
 ;;; init.el ends here

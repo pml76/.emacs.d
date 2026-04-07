@@ -27,7 +27,6 @@
       lldb
       clang-tools
       cmakeWithGui
-      ccls
       gdb
       semgrep
       python3
