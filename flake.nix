@@ -21,6 +21,10 @@
       
       # used by emacs
       ripgrep
+
+      # used to handle rust projects
+      rustup
+      
       
       # used by emacs for c++ development
       clang

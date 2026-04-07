@@ -642,11 +642,24 @@
 (global-set-key (kbd "C-c c") #'org-capture)
 
 
+;; cmake-mode ------------------------------------------------
 
 (use-package cmake-mode
   :straight t
-  :init
-  (cmake-mode))
+  :hook
+  ((cmake-mode . lsp)))
 
+;; rustic ----------------------------------------------------
+
+(use-package rust-mode
+  :straight t
+  :init
+  (setq rust-mode-treesitter-derive t))
+
+(use-package rustic
+  :straight t
+  :after (rust-mode)
+  :custom
+  (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
 
 ;;; init.el ends here
