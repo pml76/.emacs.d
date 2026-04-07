@@ -639,15 +639,5 @@
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
 
-(require 'treesit)
-
-(treesit-language-available-p 'rust)
-(treesit-language-available-p 'cpp)
-
-
-(setq major-mode-remap-alist
-      '((cpp-mode . cpp-ts-mode)
-	(rust-mode . rust-ts-mode)))
-
 
 ;;; init.el ends here
