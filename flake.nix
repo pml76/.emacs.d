@@ -33,6 +33,9 @@
       
       # used by emacs for nix development
       nixd
+
+      # used by emacs for cmake development
+      cmake-language-server
       
       # fonts
       noto-fonts
