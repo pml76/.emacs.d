@@ -586,6 +586,12 @@
     (use-package nix-mode
       :straight t
       :mode "\\.nix\\'")
+    
+    (use-package ccls
+      :straight t
+      :config
+      (setq ccls-executable "ccls")
+      :hook ((c-mode c++-mode) . (lambda () (require 'ccls) (lsp) )))
 
     (use-package dap-mode
       :straight t

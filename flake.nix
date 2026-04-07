@@ -28,6 +28,7 @@
       
       # used by emacs for c++ development
       clang
+      ccls
       lldb
       clang-tools
       cmakeWithGui
