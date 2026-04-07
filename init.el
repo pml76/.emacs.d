@@ -642,4 +642,11 @@
 (global-set-key (kbd "C-c c") #'org-capture)
 
 
+
+(use-package cmake-mode
+  :straight t
+  :init
+  (cmake-mode))
+
+
 ;;; init.el ends here
