@@ -28,7 +28,6 @@
       
       # used by emacs for c++ development
       clang
-      cmake
       ninja
       lldb
       clang-tools
