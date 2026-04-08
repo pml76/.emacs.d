@@ -1,0 +1,25 @@
+* Debugging Instructions
+
+Open a shell and run:
+
+mkdir build
+cd build
+CC=clang CXX=clang++ cmake -G Ninja -D CMAKE_BUILD_TYPE=Debug ..
+
+
+then run in emacs the following elisp snippet
+
+(dap-register-debug-template
+  "LLDB::Run"
+  (list :type "lldb-vscode"
+        :cwd "/home/peter/emacs.d/examples/hello-world-c++/build/"
+        :request "launch"
+	:target nil
+        :program "/home/peter/emacs.d/examples/hello-world-c++/build/hello-world"
+        :name "LLDB::Run"))
+
+
+and then
+
+M-x dap-debug
+
