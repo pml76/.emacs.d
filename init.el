@@ -591,8 +591,8 @@
       :straight t
       :config
 
-      ;; (require 'dap-gdb)
-      ;; (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
+      (require 'dap-gdb)
+      (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
       ;;
       ;; (dap-register-debug-template
       ;;  "GDB::Run"
