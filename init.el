@@ -591,6 +591,8 @@
       :straight t
       :config
 
+      (require 'dap-cpptools)
+
       (require 'dap-gdb)
       (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
       ;;
