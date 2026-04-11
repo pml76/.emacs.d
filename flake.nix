@@ -54,6 +54,10 @@
       cantarell-fonts
       #    all-the-icons
       emacs-all-the-icons-fonts
+
+      # some stand fonts
+      corefonts
+      vista-fonts
         
     ] # nerd-fonts
     ++ builtins.filter
