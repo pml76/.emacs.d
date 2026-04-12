@@ -637,7 +637,28 @@
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
-;; org-mode --------------------------------------------------
+;; cmake-mode ------------------------------------------------
+
+(use-package cmake-mode
+  :straight t
+  :hook
+  ((cmake-mode . lsp)))
+
+;; rustic ----------------------------------------------------
+
+;; (use-package rust-mode
+;;   :straight t
+;;   :init
+;;   (setq rust-mode-treesitter-derive t))
+
+(use-package rustic
+  :straight t
+  ;; :after rust-mode
+  :config
+  (require 'rustic-babel)
+  :custom
+  (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
+
 
 ;; Org Mode Configuration ------------------------------------------------------
 
@@ -795,7 +816,17 @@
   (pl/org-font-setup)
 
   ;; save buffers after refiling
-  (advice-add 'org-refile :after 'org-save-all-org-buffers))
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+
+  ;; Ensure rustic is loaded and mapped to 'rust'
+  (add-to-list 'org-src-lang-modes '("rust" . rustic))
+
+  ;; Optional: Set the tangle extension to 'rs' for rustic
+  (add-to-list 'org-babel-tangle-lang-exts '("rustic" . "rs"))
+
+  ;; Optional: Alias the execute function to use rustic's implementation
+  (defalias 'org-babel-execute:rust #'org-babel-execute:rustic))
 
 (use-package org-bullets
   :straight t
@@ -820,24 +851,16 @@
 (global-set-key (kbd "C-c c") #'org-capture)
 
 
-;; cmake-mode ------------------------------------------------
 
-(use-package cmake-mode
-  :straight t
-  :hook
-  ((cmake-mode . lsp)))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (rust . t)
+   (C . t)
+   (C++ . t)
+   (python . t)))
 
-;; rustic ----------------------------------------------------
 
-(use-package rust-mode
-  :straight t
-  :init
-  (setq rust-mode-treesitter-derive t))
 
-(use-package rustic
-  :straight t
-  :after (rust-mode)
-  :custom
-  (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
 
 ;;; init.el ends here
