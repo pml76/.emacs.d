@@ -644,20 +644,6 @@
   :hook
   ((cmake-mode . lsp)))
 
-;; rustic ----------------------------------------------------
-
-;; (use-package rust-mode
-;;   :straight t
-;;   :init
-;;   (setq rust-mode-treesitter-derive t))
-
-(use-package rustic
-  :straight t
-  ;; :after rust-mode
-  :config
-  (require 'rustic-babel)
-  :custom
-  (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
 
 
 ;; Org Mode Configuration ------------------------------------------------------
@@ -849,6 +835,23 @@
 (global-set-key (kbd "C-c l") #'org-store-link)
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
+
+
+
+;; rustic ----------------------------------------------------
+
+;; (use-package rust-mode
+;;   :straight t
+;;   :init
+;;   (setq rust-mode-treesitter-derive t))
+
+(use-package rustic
+  :straight t
+  ;; :after rust-mode
+  :config
+  (require 'rustic-babel)
+  :custom
+  (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
 
 
 
