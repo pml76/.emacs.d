@@ -849,7 +849,8 @@
   :straight t
   ;; :after rust-mode
   :config
-  (require 'rustic-babel)
+  (setq org-babel-load-languages '((rustic .t) (python . t)))
+  (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
   :custom
   (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
 
@@ -858,9 +859,6 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
-   (rust . t)
-   (C . t)
-   (C++ . t)
    (python . t)))
 
 
