@@ -683,7 +683,7 @@
    (org-ellipsis " ▾")                  
    (org-agenda-files
     '("~/org-agenda/Tasks.org"
-      "~/org-agenda/Habbits.org"))
+      "~/org-agenda/Habits.org"))
    
    (org-log-done 'time)                
    (org-log-into-drawer t)
