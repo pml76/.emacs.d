@@ -814,6 +814,9 @@
   ;; Optional: Alias the execute function to use rustic's implementation
   (defalias 'org-babel-execute:rust #'org-babel-execute:rustic))
 
+(use-package org-contrib
+  :straight t)
+
 (use-package org-bullets
   :straight t
   :after org
@@ -837,29 +840,25 @@
 (global-set-key (kbd "C-c c") #'org-capture)
 
 
-
-;; rustic ----------------------------------------------------
-
-;; (use-package rust-mode
-;;   :straight t
-;;   :init
-;;   (setq rust-mode-treesitter-derive t))
-
-(use-package rustic
-  :straight t
-  ;; :after rust-mode
-  :config
-  (setq org-babel-load-languages '((rustic .t) (python . t)))
-  (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
-  :custom
-  (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
-
-
-
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
    (python . t)))
+
+
+;; rustic ----------------------------------------------------
+
+(use-package rust-mode
+  :straight t
+  :init
+  (setq rust-mode-treesitter-derive t))
+
+(use-package rustic
+  :straight t
+  :after rust-mode
+  :custom
+  (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
+
 
 
 
