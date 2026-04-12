@@ -7,4 +7,7 @@ server/
 transient/
 projectile-bookmarks.eld
 examples/hello-world-c++/build/
+
 examples/hello-world-rs/target/
+examples/hello-world-rs/.cargo/
+examples/hello-world-rs/.rustup/
