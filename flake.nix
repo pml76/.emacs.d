@@ -29,6 +29,7 @@
 
       # used to handle rust projects
       rust-bin.stable.latest.default
+      rust-bin.stable.latest.rust-analyzer
       
       
       # used by emacs for c++ development
