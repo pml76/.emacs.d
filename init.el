@@ -848,6 +848,9 @@
 
 ;; rustic ----------------------------------------------------
 
+(use-package yasnippet
+  :straight t)
+
 (use-package rust-mode
   :straight t
   :init
