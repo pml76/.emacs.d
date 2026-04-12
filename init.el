@@ -682,7 +682,9 @@
   ((org-agenda-start-with-log-mode t)
    (org-ellipsis " ▾")                  
    (org-agenda-files
-    '("~/org-agenda/tasks.org"))
+    '("~/org-agenda/Tasks.org"
+      "~/org-agenda/Habbits.org"))
+   
    (org-log-done 'time)                
    (org-log-into-drawer t)
    (org-todo-keywords
@@ -704,7 +706,8 @@
        ("idea" . ?i)))
 
    (org-refile-targets
-    '(("Archive.org" :maxlevel . 1)))
+    '(("~/Org-Agenda/Archive.org" :maxlevel . 1)))
+
    
    (org-agenda-custom-commands
     '(("d" "Dashboard"
@@ -777,10 +780,14 @@
 
 	   ("m" "Metrics Capture")
 	   ("mw" "Weight" table-line (file+headline "~/Org-Agenda/Metrics.org" "Weight")
-	    "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t))))
+	    "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
 
+   (setq org-habit-graph-column 60))
   
   :config
+
+  (require 'org-habit)
+  (add-to-list 'org-modules 'org-habit)
   
   (define-key global-map (kbd "C-c j")
 	      (lambda () (interactive) (org-capture nil "jj")))
