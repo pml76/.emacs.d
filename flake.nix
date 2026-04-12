@@ -8,13 +8,18 @@
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     
   };
 
-  outputs = { self, nixpkgs, emacs-overlay }: let
+  outputs = { self, nixpkgs, emacs-overlay, rust-overlay }: let
     pkgs = import nixpkgs {
       system = "x86_64-linux";
-      overlays = [ (import emacs-overlay) ];
+      overlays = [ (import emacs-overlay) rust-overlay.overlays.default ];
     };
     emacs-additional-packages = with pkgs; [
       # gcc
@@ -23,7 +28,7 @@
       ripgrep
 
       # used to handle rust projects
-      rustup
+      rust-bin.stable.latest.default
       
       
       # used by emacs for c++ development
