@@ -856,6 +856,8 @@
 (use-package rustic
   :straight t
   :after rust-mode
+  :config
+  (require 'rustic-babel)
   :custom
   (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer")))
 
