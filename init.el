@@ -676,8 +676,19 @@
 (use-package org
   :straight t
   :hook (org-mode . pl/org-mode-setup)
-  :config
-  (setq org-ellipsis " ▾")
+  :custom
+  
+  ((org-agenda-start-with-log-mode t)
+   (org-ellipsis " ▾")                  
+   (org-agenda-files
+    '("~/org-agenda/tasks.org"))
+   (org-log-done 'time)                
+   (org-log-into-drawer t)
+   (org-todo-keywords
+    '((sequence "TODO(t)" "NEXT(n)" "|"  "DONE(!d)")
+      (sequence "BACKLOG(b)" "PLAN(p)", "READY(r)" "ACTIVE(a)", "REVIEW(v)" "WAIT(w@/!" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)"))))
+  
+  :config  
   (pl/org-font-setup))
 
 (use-package org-bullets
