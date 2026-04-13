@@ -53,6 +53,7 @@
   (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 295 :weight 'regular))
 
 (defun pl/set-transparency ()
+  "Set the transparency according to the platform."
   (cond
    ((eq system-type 'windows-nt)
     (set-frame-parameter (selected-frame) 'alpha '(95 . 100))
@@ -66,6 +67,7 @@
     (message "Unknown operating system"))))
 
 (defun pl/setup-gui ()
+  "Setup the gui."
   (pl/set-font-faces)
   (pl/set-transparency))
 
@@ -867,8 +869,7 @@ to a hook that is triggered when rustic-mode is entered."
 (use-package rustic
   :straight t
   :after rust-mode
-  :hook ((rustic-mode . pl/setup-rust-development)
-	 (rust-mode . rustic-mode))
+;  :hook (rustic-mode . pl/setup-rust-development)
   :config
   (require 'rustic-babel))
 
