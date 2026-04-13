@@ -848,6 +848,13 @@
 
 ;; rustic ----------------------------------------------------
 
+(defun pl/setup-rust-development ()
+  "Setup for rust development. 
+This routine will should be linked
+to a hook that is triggered when rustic-mode is entered."
+  (require 'dap-gdb)
+  (setq dap-dbg-debug-program '("rust-gdb" "-i" "dap")))
+
 (use-package yasnippet
   :straight t)
 
