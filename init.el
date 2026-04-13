@@ -793,6 +793,15 @@
   
   :config
 
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  (add-to-list 'org-structure-template-alist '("cc" . "src cpp"))
+  (add-to-list 'org-structure-template-alist '("hs" . "src haskell"))
+  (add-to-list 'org-structure-template-alist '("co" . "src coq"))
+  (add-to-list 'org-structure-template-alist '("rs" . "src rustic"))
+  
   (require 'org-habit)
   (add-to-list 'org-modules 'org-habit)
   
