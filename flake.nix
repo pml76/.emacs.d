@@ -14,6 +14,7 @@
   outputs = { self, nixpkgs, emacs-overlay }: let
     pkgs = import nixpkgs {
       system = "x86_64-linux";
+      config = { allowUnfree = true; };
       overlays = [ (import emacs-overlay) ];
     };
     emacs-additional-packages = with pkgs; [
@@ -54,6 +55,10 @@
       cantarell-fonts
       #    all-the-icons
       emacs-all-the-icons-fonts
+
+      # some stand fonts
+      corefonts
+      vista-fonts
         
     ] # nerd-fonts
     ++ builtins.filter

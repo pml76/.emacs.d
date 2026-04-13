@@ -53,6 +53,7 @@
   (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 295 :weight 'regular))
 
 (defun pl/set-transparency ()
+  "Set the transparency according to the platform."
   (cond
    ((eq system-type 'windows-nt)
     (set-frame-parameter (selected-frame) 'alpha '(95 . 100))
@@ -66,6 +67,7 @@
     (message "Unknown operating system"))))
 
 (defun pl/setup-gui ()
+  "Setup the gui."
   (pl/set-font-faces)
   (pl/set-transparency))
 
@@ -857,6 +859,14 @@
 
 ;; rustic ----------------------------------------------------
 
+(defun pl/setup-rust-development ()
+  "Setup for rust development. 
+This routine will should be linked
+to a hook that is triggered when rustic-mode is entered."
+  (require 'dap-gdb)
+  (with-suppressed-warnings ((free-vars dap-gdb-debug-program))
+    (setq dap-gdb-debug-program '("rust-gdb" "-i" "dap"))))
+
 (use-package yasnippet
   :straight t)
 
@@ -868,6 +878,7 @@
 (use-package rustic
   :straight t
   :after rust-mode
+;  :hook (rustic-mode . pl/setup-rust-development)
   :config
   (require 'rustic-babel))
 
