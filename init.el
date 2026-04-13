@@ -853,7 +853,8 @@
 This routine will should be linked
 to a hook that is triggered when rustic-mode is entered."
   (require 'dap-gdb)
-  (setq dap-dbg-debug-program '("rust-gdb" "-i" "dap")))
+  (with-suppressed-warnings ((free-vars dap-gdb-debug-program))
+    (setq dap-gdb-debug-program '("rust-gdb" "-i" "dap"))))
 
 (use-package yasnippet
   :straight t)
@@ -866,6 +867,8 @@ to a hook that is triggered when rustic-mode is entered."
 (use-package rustic
   :straight t
   :after rust-mode
+  :hook ((rustic-mode . pl/setup-rust-development)
+	 (rust-mode . rustic-mode))
   :config
   (require 'rustic-babel))
 
