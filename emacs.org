@@ -1,0 +1,134 @@
+#+title: Peter's EMACS Configuration
+
+#+PROPERTY: header-args:emacs-lisp :tangle ./emacs.el
+
+* straight.el Setup
+
+straight.el is a package manager for emacs that is
+
+ - compatible with use-package,
+ - allows to pin down the version of each package it installs, and
+ - downloads the source code of each package it installs and compiles it.
+
+
+ The following code snippet downloads and installs straight.el. In case this does not work one can clone the straight.el repo from github into ~/.emacs.d/straight/repos.
+
+#+begin_src emacs-lisp
+
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name
+  	"straight/repos/straight.el/bootstrap.el"
+  	(or (bound-and-true-p straight-base-dir)
+  	    user-emacs-directory)))
+        (bootstrap-version 7))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+  	(url-retrieve-synchronously
+  	 "https://radian-software.github.io/straight.el/install.el"
+  	 'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+
+  (straight-use-package 'use-package)
+
+#+end_src
+
+* Basic UI configuration
+
+** Basics
+
+#+begin_src emacs-lisp
+
+(defvar pl/default-font-size 180)
+
+(setq inhibit-startup-message t)
+
+(scroll-bar-mode -1)        ; Disable visible scrollbar
+(tool-bar-mode -1)          ; Disable the toolbar
+(tooltip-mode -1)           ; Disable tooltips
+(set-fringe-mode 10)        ; Give some breathing room
+
+(menu-bar-mode -1)          ; Disable the menu bar
+
+#+end_src
+
+** Font Setup
+
+Currently I am using Fira Code and Cantarel fonts. These fonts are located in the fonts subfolder in case you are on windows and did not install them. Otherwise the nix flake will install them automatically once you include the
+additional-emacs-packages in you packages.
+
+#+begin_src emacs-lisp
+
+  ;  (defun pl/set-font-faces ()
+  (message "Setting faces!")
+    ;(set-face-attribute 'default nil :font "JetBrains Mono" :weight 'light :height 180)
+    ;(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 190)
+    ;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :weight 'light :height 1.3)
+    ; (set-face-attribute 'default nil :font "Fira Code" :height pl/default-font-size)
+
+  (when (member "Source Code Pro" (font-family-list))
+    (set-face-attribute 'default nil :font "Source Code Pro"
+  		      :height pl/default-font-size))
+
+(use-package mixed-pitch
+  :defer t
+  :config
+  (when (member "Source Serif 4" (font-family-list))
+    (set-face-attribute 'variable-pitch nil :family "Source Serif 4")))
+
+    ;; Set the fixed pitch face
+    ;(set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 260)
+
+    ;; Set the variable pitch face
+    ;(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 295 :weight 'regular))
+
+#+end_src
+
+** Setup transparency
+
+Working in a slightly transparent frame looks cool! So let's configure it. Unfortunately, it does work a little different on windows, since the variable alpha-background is not supported there. 
+
+#+begin_src emacs-lisp
+
+  (defun pl/set-transparency ()
+  "Set the transparency according to the platform."
+  (cond
+   ((eq system-type 'windows-nt)
+    (set-frame-parameter (selected-frame) 'alpha '(95 . 100))
+    (add-to-list 'default-frame-alist '(alpha . (95 . 100)))
+    (message "Running on Windows"))
+   ((eq system-type 'gnu/linux)
+    (set-frame-parameter nil 'alpha-background 95)
+    (add-to-list 'default-frame-alist '(alpha-background . 95))
+    (message "Running on GNU/Linux"))
+   (t
+    (message "Unknown operating system"))))
+
+#+end_src
+
+** Putting things together
+
+We have to make sure that a frame is set up when we are in running in a daemon.
+
+#+begin_src emacs-lisp
+
+  (defun pl/setup-gui ()
+    "Setup the gui."
+    (pl/set-font-faces)
+    (pl/set-transparency))
+
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+  	      (lambda (frame)
+  		;; (setq doom-modeline-icon t)
+  		(with-selected-frame frame
+  		  (pl/setup-gui)
+  		  )))
+    (pl/setup-gui))
+
+#+end_src
+
+* Advanced UI configuration
+
