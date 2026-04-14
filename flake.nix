@@ -59,6 +59,10 @@
       # some stand fonts
       corefonts
       vista-fonts
+
+      source-serif
+      source-sans
+      source-code-pro
         
     ] # nerd-fonts
     ++ builtins.filter
