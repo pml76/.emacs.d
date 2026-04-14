@@ -875,10 +875,15 @@ to a hook that is triggered when rustic-mode is entered."
   :init
   (setq rust-mode-treesitter-derive t))
 
+(use-package flymake
+  :straight t
+  :hook (rustic-mode . flymake-mode))
+
 (use-package rustic
   :straight t
+  :after flymake
   :after rust-mode
-;  :hook (rustic-mode . pl/setup-rust-development)
+					;  :hook (rustic-mode . pl/setup-rust-development)
   :config
   (require 'rustic-babel))
 
