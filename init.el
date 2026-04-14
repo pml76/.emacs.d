@@ -145,8 +145,13 @@
   :config
   (setq which-key-idle-delay 1))
 
+
+(use-package shortdoc
+  :straight t)
+
 (use-package helpful
   :straight t
+  :after shortdoc
   :bind
   ("C-h f" . helpful-callable)
   ("C-h v" . helpful-variable)
