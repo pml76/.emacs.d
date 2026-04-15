@@ -50,7 +50,7 @@
       cmake-language-server
 
       #claude code for testing ...
-      claude-code.packages.${system}.claude-code
+      claude-code.packages.${stdenv.hostPlatform.system}.claude-code
       
       # fonts
       noto-fonts
