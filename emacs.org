@@ -253,6 +253,7 @@ Better help sites for elisp function used by emacs.
 [[https://github.com/minad/vertico?tab=readme-ov-file][Vertico]] is a lightweight Emacs package that provides a minimal, fast vertical user interface for minibuffer completions, such as M-x, file opening, and buffer switching. It builds directly on Emacs’ built-in completion system, ensuring full compatibility with existing commands while focusing only on display and interaction, not replacing core logic
 
 #+begin_src emacs-lisp
+
   (use-package vertico
     :straight t
     :custom
@@ -263,10 +264,28 @@ Better help sites for elisp function used by emacs.
     :init
     (vertico-mode))
 
+#+end_src
+
+
+** Savehist
+
+[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Emacs-Sessions.html][savehist]] is a built-in Emacs minor mode that persists your minibuffer history across sessions. It periodically saves inputs you've typed at minibuffer prompts — such as commands, search strings, file paths, and other queries — to a file on disk. When you restart Emacs, that history is restored, so you can navigate back to previous inputs with M-p / M-n without having to retype them.
+
+#+begin_src emacs-lisp
+
   (use-package savehist
     :straight t
     :init
     (savehist-mode))
+
+#+end_src
+
+
+** Marginalia
+
+[[https://github.com/minad/marginalia][Marginalia]] adds rich, colorful annotations to Emacs minibuffer completion candidates — for example, showing docstrings next to commands, file permissions next to files, or symbol types (function, variable, command) next to Elisp symbols. It automatically detects the category of what you're completing and picks an appropriate annotator for it.
+
+#+begin_src emacs-lisp
 
   (use-package marginalia
     :straight t
@@ -284,6 +303,15 @@ Better help sites for elisp function used by emacs.
     ;; the package.
     (marginalia-mode))
 
+#+end_src
+
+
+** Orderless
+
+[[https://github.com/oantolin/orderless][orderless]] is an Emacs completion style that lets you filter candidates using multiple space-separated search terms that can appear in any order.
+
+#+begin_src emacs-lisp
+
   (use-package orderless
     :straight t
     :custom
@@ -295,13 +323,31 @@ Better help sites for elisp function used by emacs.
     (completion-category-defaults nil)
     (completion-pcm-leading-wildcard t))
 
+#+end_src
 
-  (use-package nerd-icons-completion
+
+** Nerd-Icons-Completion
+
+[[https://github.com/rainstormstudio/nerd-icons-completion][nerd-icons-completion]] adds Nerd Font icons to minibuffer completion candidates. It integrates with the nerd-icons library and works alongside Marginalia, so that items in your completion list (files, commands, buffers, etc.) get a small icon prepended to them, making it easier to visually distinguish between different types of candidates at a glance.
+
+#+begin_src emacs-lisp
+
+    (use-package nerd-icons-completion
     :straight t
     :after nerd-icons
     :config
     (nerd-icons-completion-mode)
     (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+#+end_src
+
+
+** Corfu
+
+[[https://github.com/minad/corfu][Corfu]] is an in-buffer completion UI package — it displays a small popup (using a child frame) showing completion candidates right at your cursor position as you type. It works with Emacs' built-in completion-at-point infrastructure, so it's compatible with LSP, Eglot, and other backends without bundling any of its own.
+
+#+begin_src emacs-lisp
+
 
   (use-package corfu
     :straight t
@@ -330,6 +376,15 @@ Better help sites for elisp function used by emacs.
     ;; (corfu-history-mode)
     ;; (corfu-popupinfo-mode)
     )
+ 
+#+end_src
+
+
+** Cape
+
+[[https://github.com/minad/cape][Cape]] (Completion At Point Extensions) is a companion package to Corfu that provides a collection of additional completion backends (completion-at-point-functions). It adds useful completions that aren't built into Emacs by default, such as file names, dictionary words, Emacs Lisp symbols, shell history, and entire lines from the current buffer.
+
+#+begin_src emacs-lisp
 
   ;; Add extensions
   (use-package cape
@@ -354,6 +409,15 @@ Better help sites for elisp function used by emacs.
     ;; ...
   )
 
+#+end_src
+
+
+** Dabbrev
+
+[[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dynamic-Abbrevs.html][dabbrev]] (Dynamic Abbreviations) is a built-in Emacs package that lets you expand partially typed words by scanning your open buffers for matches. You type a few letters and press M-/, and Emacs completes the word by finding the nearest matching word in the current buffer, then other open buffers. Pressing M-/ again cycles through alternative expansions
+
+#+begin_src emacs-lisp
+
   ;; Use Dabbrev with Corfu!
   (use-package dabbrev
     :straight t
@@ -367,6 +431,13 @@ Better help sites for elisp function used by emacs.
     (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
     (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
+#+end_src
+
+** Emacs
+
+The package /emacs/ is not a real installable package — it's a pseudo-package used as a convenient catch-all in use-package declarations. It lets you apply use-package's structured keywords (:init, :config, :bind, :hook, etc.) to general built-in Emacs settings that don't belong to any specific package. It also supports a :ensure value to declare a minimum required Emacs version. Essentially, it's just a tidy way to organize global Emacs configuration within the same use-package style as the rest of your init file.
+
+#+begin_src emacs-lisp
   ;; A few more useful configurations...
   (use-package emacs
     :straight t
@@ -400,7 +471,15 @@ Better help sites for elisp function used by emacs.
     ;; useful beyond Corfu.
     (read-extended-command-predicate #'command-completion-default-include-p))
 
+#+end_src
 
+
+** Consult
+
+[[https://github.com/minad/consult][Consult]] provides a rich set of search and navigation commands built on top of Emacs' standard completing-read. It enhances common tasks like buffer switching, line search, grep, file finding, and outline navigation — all through the minibuffer. Its standout feature is live preview: as you scroll through candidates, Emacs shows the corresponding content in another window. It integrates seamlessly with Vertico, Orderless, Marginalia, and Embark to form a powerful completion ecosystem.
+
+#+begin_src emacs-lisp
+  
   (use-package consult
     :straight t
     ;; Replace bindings. Lazily loaded by `use-package'.
@@ -501,6 +580,30 @@ Better help sites for elisp function used by emacs.
     ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
     )
 
+#+end_src
+
+
+** consult-lsp
+
+[[https://github.com/gagbo/consult-lsp][consult-lsp]] bridges lsp-mode and Consult, bringing LSP data into Consult's minibuffer interface (with live preview, filtering, etc.). It is essentially the Consult equivalent of helm-lsp or lsp-ivy, and provides three main commands: browsing workspace diagnostics (consult-lsp-diagnostics), searching symbols across the workspace (consult-lsp-symbols), and searching symbols within the current file (consult-lsp-file-symbols).
+
+#+begin_src emacs-lisp
+
+  (use-package consult-lsp
+    :after (consult lsp-mode)
+    :bind (:map lsp-mode-map
+                ("C-c l s s" . consult-lsp-symbols)
+                ("C-c l s f" . consult-lsp-file-symbols)
+                ("C-c l s d" . consult-lsp-diagnostics)))
+
+#+end_src
+
+** Embark
+
+[[https://github.com/oantolin/embark][Embark]] (Mini-Buffer Actions Rooted in Keymaps) acts like a context-sensitive right-click menu for Emacs. At any point — whether in the minibuffer or a regular buffer — you invoke embark-act on the thing near your cursor (a file, buffer, URL, symbol, package, etc.) and get a menu of relevant actions for that type of target. For example, on a file you can rename, delete, or copy it; on a URL you can browse or download it.
+
+
+#+begin_src emacs-lisp
   (use-package embark
     :straight t
 
@@ -533,10 +636,307 @@ Better help sites for elisp function used by emacs.
     (add-to-list 'display-buffer-alist
                  '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                    nil
-                   (window-parameters (mode-line-format . none)))))
+                   (window-parameters (mode-line-format . none)))))  
+#+end_src
 
-  ;; Consult users will also want the embark-consult package.
+
+** embark-consult
+
+[[https://elpa.gnu.org/packages/embark-consult.html][embark-consult]] is a glue package that bridges Embark and Consult, adding integrations between the two. Most notably, it lets you export Consult search results (e.g. from consult-grep or consult-line) into an editable Occur/Grep buffer, and it makes Consult's search commands context-aware when triggered as Embark actions — so they automatically search within the files or buffers that are your current targets. It's a small but powerful connector that makes the two packages work together seamlessly.
+
+#+begin_src emacs-lisp
+
   (use-package embark-consult
     :straight t)
+
+#+end_src
+
+
+* Treemacs
+
+[[https://github.com/Alexander-Miller/treemacs][Treemacs]] is a tree-style file and project explorer for Emacs, similar to VS Code's file sidebar or Vim's NERDTree. It displays your projects and their file hierarchies in a persistent side panel, with support for git status highlighting, file tags via Imenu, mouse interaction, and auto-refresh on filesystem changes. It also saves and restores your workspace between sessions, and integrates with LSP via lsp-treemacs.
+
+#+begin_src emacs-lisp
+(use-package treemacs
+  :straight t
+  :config
+  (progn
+    (setq treemacs-buffer-name-function            #'treemacs-default-buffer-name
+          treemacs-buffer-name-prefix              " *Treemacs-Buffer-"
+          treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay        0.5
+          treemacs-directory-name-transformer      #'identity
+          treemacs-display-in-side-window          t
+          treemacs-eldoc-display                   'simple
+          treemacs-file-event-delay                2000
+          treemacs-file-extension-regex            treemacs-last-period-regex-value
+          treemacs-file-follow-delay               0.2
+          treemacs-file-name-transformer           #'identity
+          treemacs-follow-after-init               t
+          treemacs-expand-after-init               t
+          treemacs-find-workspace-method           'find-for-file-or-pick-first
+          treemacs-git-command-pipe                ""
+          treemacs-goto-tag-strategy               'refetch-index
+          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+          treemacs-hide-dot-git-directory          t
+          treemacs-hide-dot-jj-directory           t
+          treemacs-indentation                     2
+          treemacs-indentation-string              " "
+          treemacs-is-never-other-window           nil
+          treemacs-max-git-entries                 5000
+          treemacs-missing-project-action          'ask
+          treemacs-move-files-by-mouse-dragging    t
+          treemacs-move-forward-on-expand          nil
+          treemacs-no-png-images                   nil
+          treemacs-no-delete-other-windows         t
+          treemacs-project-follow-cleanup          nil
+          treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                        'left
+          treemacs-read-string-input               'from-child-frame
+          treemacs-recenter-distance               0.1
+          treemacs-recenter-after-file-follow      nil
+          treemacs-recenter-after-tag-follow       nil
+          treemacs-recenter-after-project-jump     'always
+          treemacs-recenter-after-project-expand   'on-distance
+          treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+          treemacs-project-follow-into-home        nil
+          treemacs-show-cursor                     nil
+          treemacs-show-hidden-files               t
+          treemacs-silent-filewatch                nil
+          treemacs-silent-refresh                  nil
+          treemacs-sorting                         'alphabetic-asc
+          treemacs-select-when-already-in-treemacs 'move-back
+          treemacs-space-between-root-nodes        t
+          treemacs-tag-follow-cleanup              t
+          treemacs-tag-follow-delay                1.5
+          treemacs-text-scale                      nil
+          treemacs-user-mode-line-format           nil
+          treemacs-user-header-line-format         nil
+          treemacs-wide-toggle-width               70
+          treemacs-width                           35
+          treemacs-width-increment                 1
+          treemacs-width-is-initially-locked       t
+          treemacs-workspace-switch-cleanup        nil)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode 'always)
+    (when treemacs-python-executable
+      (treemacs-git-commit-diff-mode t))
+
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple)))
+
+    (treemacs-hide-gitignored-files-mode nil))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(treemacs-start-on-boot)
+
+#+end_src
+
+
+** treemacs-projectile
+
+[[https://github.com/Alexander-Miller/treemacs/blob/master/src/extra/treemacs-projectile.el][treemacs-projectile]] is a small integration package that connects Treemacs and Projectile. Its main feature is letting you add your Projectile-known projects directly to the Treemacs workspace with a single command, so your project file trees show up in the Treemacs side panel without having to register them manually.
+
+
+#+begin_src emacs-lisp
+
+  (use-package treemacs-projectile
+  :straight t
+  :after (treemacs projectile)
+  :ensure t)
+
+#+end_src
+
+
+** treemacs-icons-dired
+
+[[https://github.com/Alexander-Miller/treemacs/blob/master/src/extra/treemacs-icons-dired.el][treemacs-icons-dired]] is a small integration package that brings Treemacs' file icons into Emacs' built-in Dired file browser. When you enable treemacs-icons-dired-mode, your Dired buffers display the same styled file and folder icons used by Treemacs, giving you a consistent and more visually informative directory browsing experience across both interfaces.
+
+#+begin_src emacs-lisp
+(use-package treemacs-icons-dired
+  :straight t
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
+
+#+end_src
+
+** treemacs-magit
+
+[[https://github.com/Alexander-Miller/treemacs/blob/master/src/extra/treemacs-magit.el][treemacs-magit]] is a small glue package that keeps Treemacs' git status display in sync with Magit operations. Without it, actions like staging files or making commits in Magit don't trigger file-watch events, so Treemacs wouldn't automatically update its git status highlighting. This package hooks into Magit to notify Treemacs of those changes, eliminating the need for a manual refresh after git operations.
+
+#+begin_src emacs-lisp
+(use-package treemacs-magit
+  :straight t
+  :after (treemacs magit))
+
+;(use-package treemacs-perspective ;;treemacs-perspective if you use perspective.el vs. persp-mode
+;  :straight t
+;  :after (treemacs perspective) ;;or perspective vs. persp-mode
+;  :config (treemacs-set-scope-type 'Perspectives))
+
+
+#+end_src
+
+
+** treemacs-tab-bar
+
+[[https://github.com/Alexander-Miller/treemacs][treemacs-tab-bar]] integrates Treemacs with Emacs' built-in tab-bar-mode, allowing each tab to have its own independent Treemacs workspace. By default, Treemacs scopes its workspace per frame, but with this package enabled, each tab-bar tab gets its own isolated file tree — making it easier to work on multiple projects simultaneously, each in their own tab with their own dedicated Treemacs view.
+
+#+begin_src emacs-lisp
+(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
+  :straight t
+  :after (treemacs)
+  :config (treemacs-set-scope-type 'Tabs))
+
+
+#+end_src
+
+
+* Magit
+
+[[https://magit.vc/][Magit]] is a full-featured Git interface inside Emacs, often called one of Emacs' "killer apps." It lets you perform virtually all Git operations — staging (even individual hunks or partial hunks), committing, branching, merging, rebasing, cherry-picking, blaming, and more — through an intuitive, keyboard-driven interface. Under the hood it simply runs Git commands, so it's transparent and educational, but it makes even complex Git workflows far faster than the command line.
+
+#+begin_src emacs-lisp
+
+  (use-package magit
+    :straight t
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+  (setenv "GIT_ASKPASS" "git-gui--askpass")
+
+#+end_src
+
+
+* Projectile
+
+[[https://github.com/bbatsov/projectile][Projectile]] is a project interaction library for Emacs. It auto-detects projects (via VCS roots, build files, etc.) and provides a rich set of project-level commands — quickly finding and switching between files, project-wide search and replace, running tests and builds, and toggling between related files (e.g. header ↔ source). It supports 60+ project types out of the box (Rails, Django, Maven, etc.) and requires no external dependencies for basic use.
+
+#+begin_src emacs-lisp
+
+  (use-package projectile
+    :straight t
+    :diminish projectile
+    :config (projectile-mode)
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/Projects")
+      (setq projectile-project-search-path '("~/Projects")))
+    (setq projectile-switch-project-action #'projectile-dired))
+  
+#+end_src
+
+
+* lsp-mode
+
+[[https://github.com/emacs-lsp/lsp-mode][lsp-mode]] is an Emacs client for the Language Server Protocol (LSP), which turns Emacs into a full IDE for virtually any programming language. It communicates with a language-specific server (e.g. pyright for Python, clangd for C/C++) to provide features that would otherwise require language-specific plugins:
+
+- Code completion via completion-at-point or Company
+- Real-time diagnostics/linting via Flycheck or Flymake
+- Go to definition, find references, rename symbol
+- Code actions (e.g. auto-imports, refactoring suggestions)
+- Hover documentation
+- Code formatting
+- Debugging via dap-mode (Debug Adapter Protocol)
+
+It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, Projectile, and others — and supports 50+ languages out of the box.
+
+#+begin_src emacs-lisp
+
+    (defun pl/lsp-mode-setup ()
+      (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (lsp-headerline-breadcrumb-mode))
+
+
+  (use-package lsp-mode
+    :straight t
+    :custom
+    (lsp-completion-provider :none) ;; we use Corfu!
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+
+    (defun my/lsp-mode-setup-completion ()
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(flex))) ;; Configure flex  
+    :hook
+    ((lsp-mode . pl/lsp-mode-setup)
+     (lsp-completion-mode . my/lsp-mode-setup-completion)
+     (c++-mode . lsp)
+     (c-mode . lsp)
+     (nix-mode . lsp)
+     (lsp-mode . lsp-enable-which-key-integration))
+    :commands (lsp lsp-deferred))
+
+
+  (defun pl/when-linux-install ()
+    (cond
+     ((eq system-type 'gnu/linux)
+      ;; nix-mode ------------------------------------------------------------
+
+      (use-package nix-mode
+        :straight t
+        :mode "\\.nix\\'")
+      
+      (use-package dap-mode
+        :straight t
+        :config
+
+        (require 'dap-cpptools)
+
+        (require 'dap-gdb)
+        (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
+        ;;
+        ;; (dap-register-debug-template
+        ;;  "GDB::Run"
+        ;;  (list :type "gdb"
+        ;;        :request "launch"
+        ;;        :name "GDB::Run"
+        ;;        :target nil
+        ;; 	 :program "/home/peter/tmp/a.out"
+        ;;        :cwd "/home/peter/tmp/"
+        ;; 	 ))
+        
+        (require 'dap-lldb)
+        (setq dap-lldb-debug-program '("lldb-dap"))
+        ;; (dap-register-debug-template
+        ;;  "LLDB::Run"
+        ;;  (list :type "lldb-vscode"
+        ;;        :cwd "/home/peter/tmp/"
+        ;;        :request "launch"
+        ;;        :program "/home/peter/tmp/a.out"
+        ;;        :name "LLDB::Run"))
+        
+        )
+      )))
+
+  (pl/when-linux-install)
+
+  (use-package lsp-ui
+    :straight t
+    :commands lsp-ui-mode)
+
+  (use-package flycheck
+    :straight t
+    :config
+    (add-hook 'after-init-hook #'global-flycheck-mode))
   
 #+end_src
