@@ -55,6 +55,7 @@
       cantarell-fonts
       #    all-the-icons
       emacs-all-the-icons-fonts
+      jetbrains-mono
 
       # some stand fonts
       corefonts
