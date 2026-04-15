@@ -316,7 +316,7 @@
   :straight t
   ;; Replace bindings. Lazily loaded by `use-package'.
   :bind ;; C-c bindings in `mode-specific-map'
-  ("C-c M-x" . consult-mode-command)
+  ( ("C-c M-x" . consult-mode-command)
   ("C-c h" . consult-history)
   ("C-c k" . consult-kmacro)
   ("C-c m" . consult-man)
@@ -361,14 +361,14 @@
   ("M-s e" . consult-isearch-history)
   :map isearch-mode-map
   ("M-e" . consult-isearch-history) ;; orig. isearch-edit-string
-  ;; ("M-s e" . consult-isearch-history) ;; orig. isearch-edit-string
-  ;; ("M-s l" . consult-line) ;; needed by consult-line to detect isearch
-  ;; ("M-s L" . consult-line-multi)	;; needed by consult-line to detect isearch
-  ;; ;; Minibuffer history
-  ;; :map minibuffer-local-map
-  ;; ("M-s" . consult-history) ;; orig. next-matching-history-element
-  ;; ("M-r" . consult-history) ;; orig. previous-matching-history-element
-
+  ("M-s e" . consult-isearch-history) ;; orig. isearch-edit-string
+  ("M-s l" . consult-line) ;; needed by consult-line to detect isearch
+  ("M-s L" . consult-line-multi)	;; needed by consult-line to detect isearch
+  ;; Minibuffer history
+  :map minibuffer-local-map
+  ("M-s" . consult-history) ;; orig. next-matching-history-element
+  ("M-r" . consult-history) ;; orig. previous-matching-history-element
+  )
   ;; The :init configuration is always executed (Not lazy)
   :init
 
