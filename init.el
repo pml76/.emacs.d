@@ -901,33 +901,33 @@
 
 ;; rustic ----------------------------------------------------
 
-(defun pl/setup-rust-development ()
-  "Setup for rust development. 
-This routine will should be linked
-to a hook that is triggered when rustic-mode is entered."
-  (require 'dap-gdb)
-  (with-suppressed-warnings ((free-vars dap-gdb-debug-program))
-    (setq dap-gdb-debug-program '("rust-gdb" "-i" "dap"))))
+;; (defun pl/setup-rust-development ()
+;;   "Setup for rust development. 
+;; This routine will should be linked
+;; to a hook that is triggered when rustic-mode is entered."
+;;   (require 'dap-gdb)
+;;   (with-suppressed-warnings ((free-vars dap-gdb-debug-program))
+;;     (setq dap-gdb-debug-program '("rust-gdb" "-i" "dap"))))
 
-(use-package yasnippet
-  :straight t)
+;; (use-package yasnippet
+;;   :straight t)
 
-(use-package rust-mode
-  :straight t
-  :init
-  (setq rust-mode-treesitter-derive t))
+;; (use-package rust-mode
+;;   :straight t
+;;   :init
+;;   (setq rust-mode-treesitter-derive t))
 
-(use-package flymake
-  :straight t
-  :hook (rustic-mode . flymake-mode))
+;; (use-package flymake
+;;   :straight t
+;;   :hook (rustic-mode . flymake-mode))
 
-(use-package rustic
-  :straight t
-  :after flymake
-  :after rust-mode
-					;  :hook (rustic-mode . pl/setup-rust-development)
-  :config
-  (require 'rustic-babel))
+;; (use-package rustic
+;;   :straight t
+;;   :after flymake
+;;   :after rust-mode
+;; 					;  :hook (rustic-mode . pl/setup-rust-development)
+;;   :config
+;;   (require 'rustic-babel))
 
 
 
