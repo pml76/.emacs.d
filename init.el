@@ -877,26 +877,26 @@
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-;; (defun pl/org-mode-visual-fill ()
-;;   (setq visual-fill-column-width 100
-;;         visual-fill-column-center-text t)
-;;   (visual-fill-column-mode 1))
+(defun pl/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
 
-;; (use-package visual-fill-column
-;;   :straight t
-;;   :hook (org-mode . pl/org-mode-visual-fill))
+(use-package visual-fill-column
+  :straight t
+  :hook (org-mode . pl/org-mode-visual-fill))
 
-;; ;; org-store-link, org-agenda, and org-capture should be
-;; ;; reachable from anywhere
-;; (global-set-key (kbd "C-c l") #'org-store-link)
-;; (global-set-key (kbd "C-c a") #'org-agenda)
-;; (global-set-key (kbd "C-c c") #'org-capture)
+;; org-store-link, org-agenda, and org-capture should be
+;; reachable from anywhere
+(global-set-key (kbd "C-c l") #'org-store-link)
+(global-set-key (kbd "C-c a") #'org-agenda)
+(global-set-key (kbd "C-c c") #'org-capture)
 
 
-;; (org-babel-do-load-languages
-;;  'org-babel-load-languages
-;;  '((emacs-lisp . t)
-;;    (python . t)))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)))
 
 
 ;; rustic ----------------------------------------------------
