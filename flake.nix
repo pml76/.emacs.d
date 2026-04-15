@@ -8,15 +8,21 @@
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     
   };
 
-  outputs = { self, nixpkgs, emacs-overlay }: let
+  outputs = { self, nixpkgs, emacs-overlay, claude-code }: let
     pkgs = import nixpkgs {
       system = "x86_64-linux";
       config = { allowUnfree = true; };
       overlays = [ (import emacs-overlay) ];
     };
+
     emacs-additional-packages = with pkgs; [
       # gcc
       
@@ -42,6 +48,9 @@
 
       # used by emacs for cmake development
       cmake-language-server
+
+      #claude code for testing ...
+      claude-code.packages.${system}.claude-code
       
       # fonts
       noto-fonts
@@ -70,7 +79,9 @@
       lib.attrsets.isDerivation
       (builtins.attrValues pkgs.nerd-fonts);  
   in {
-  
+
+    claude-code = claude-code;
+    
     emacs-init-el = ./init.el;
     emacs-early-init-el = ./early-init.el;
 
