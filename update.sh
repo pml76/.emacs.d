@@ -1,6 +1,7 @@
 #!env sh
 
 echo "updating emacs config ..."
+git pull
 git commit -am "."
 git push
 cd ../nixos-cfg
