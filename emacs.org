@@ -1,6 +1,6 @@
 #+title: Peter's EMACS Configuration
 
-#+PROPERTY: header-args:emacs-lisp :tangle ./emacs.el
+#+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
 * straight.el Setup
 
@@ -519,7 +519,7 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
     :straight t
     ;; Replace bindings. Lazily loaded by `use-package'.
     :bind ;; C-c bindings in `mode-specific-map'
-    ("C-c M-x" . consult-mode-command)
+    (("C-c M-x" . consult-mode-command)
     ("C-c h" . consult-history)
     ("C-c k" . consult-kmacro)
     ("C-c m" . consult-man)
@@ -570,7 +570,7 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
     ;; Minibuffer history
     :map minibuffer-local-map
     ("M-s" . consult-history) ;; orig. next-matching-history-element
-    ("M-r" . consult-history) ;; orig. previous-matching-history-element
+    ("M-r" . consult-history)) ;; orig. previous-matching-history-element
 
     ;; The :init configuration is always executed (Not lazy)
     :init
