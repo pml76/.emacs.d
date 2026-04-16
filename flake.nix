@@ -36,6 +36,8 @@
       # used by emacs for c++ development
       clang
       ninja
+      gnumake
+      libtool
       lldb
       clang-tools
       cmakeWithGui

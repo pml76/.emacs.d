@@ -2,6 +2,32 @@
 
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
+  Bugs / Key Binding Conflicts
+
+  1. C-c c is double-bound — org-capture (line 957) and claude-code-command-map (line 1024) both claim it. One will silently shadow the other.
+  2. C-c l is double-bound — lsp-keymap-prefix "C-c l" (line 647) and org-store-link (line 955) conflict.
+  3. C-c p is double-bound — cape-prefix-map (line 272) and projectile-command-map (line 628) conflict.
+  4. Typo in doom-themes custom vars (lines 114–115):
+  (doom-themes-enabe bold t)    ;; should be doom-themes-enable-bold
+  (doom-themes enable-italic t) ;; should be doom-themes-enable-italic (missing hyphen)
+  4. These silently do nothing — bold/italic are never enabled.
+  5. setq inside :custom (line 881):
+  (setq org-habit-graph-column 60) ;; wrong — should just be (org-habit-graph-column 60)
+  6. Wrong variable name in pl/lsp-mode-setup (line 637):
+  (setq pl/lsp-headerline-breadcrumb-segments ...) ;; should be lsp-headerline-breadcrumb-segments
+  6. The pl/ prefix means this sets a custom variable that lsp-mode never reads.
+
+  Minor Issues
+
+  7. read-extended-command-predicate set twice in the use-package emacs block (lines 318 and 336) — the second one wins, the first is dead.
+  8. consult-lsp missing :straight t (line 443) — will fail on a fresh install.
+  9. (use-package emacs :straight t) — emacs is built-in; :straight t is harmless but misleading.
+  10. Two separate cond ((eq system-type 'gnu/linux) ...) blocks (lines 662 and 697) — could be merged into one.
+  11. (treemacs-start-on-boot) called at top level (line 579) — should be inside the use-package treemacs :config block to ensure it runs only after treemacs loads.
+
+  The key binding conflicts (#1–3) and the doom-themes typos (#4) are the most impactful to fix. Want me to apply any of these?
+
+
 * straight.el Setup
 
 [[https://github.com/radian-software/straight.el][straight.el]] is a next-generation package manager for Emacs that replaces the built-in package.el. Instead of downloading pre-built tarballs, it installs packages by cloning their Git repositories directly, giving you precise control over versions. This makes your Emacs configuration fully reproducible — you can lock packages to exact commits and share a consistent setup across machines. It also makes local package development easy, since you're just editing the live Git checkout. It integrates well with use-package as a drop-in alternative to :ensure.
@@ -1364,5 +1390,55 @@ TODO: https://robert.kra.hn/posts/rust-emacs-setup/
     :after rust-mode
     :config
     (require 'rustic-babel))
+
+#+end_src
+
+* Claude-code
+
+#+begin_src emacs-lisp
+
+     ;; install required inheritenv dependency:
+   (use-package inheritenv
+     :straight (:type git :host github :repo "purcell/inheritenv"))
+
+   ;; for eat terminal backend:
+   (use-package eat
+     :straight (:type git
+                      :host codeberg
+                      :repo "akib/emacs-eat"
+                      :files ("*.el" ("term" "term/*.el") "*.texi"
+                              "*.ti" ("terminfo/e" "terminfo/e/*")
+                              ("terminfo/65" "terminfo/65/*")
+                              ("integration" "integration/*")
+                              (:exclude ".dir-locals.el" "*-tests.el"))))
+
+   ;; for vterm terminal backend:
+   (use-package vterm :straight t)
+
+
+  (use-package monet :straight ( :type git
+  			       :host github
+  			       :repo "stevemolitor/monet"))
+
+   ;; install claude-code.el, using :depth 1 to reduce download size:
+   (use-package claude-code
+     :straight (:type git
+   		   :host github
+   		   :repo "stevemolitor/claude-code.el"
+   		   :branch "main" :depth 1
+                      :files ("*.el" (:exclude "images/*")))
+     :bind-keymap
+     ("C-c c" . claude-code-command-map) ;; or your preferred key
+     ;; Optionally define a repeat map so that "M" will cycle thru Claude auto-accept/plan/confirm modes after invoking claude-code-cycle-mode / C-c M.
+     :bind
+     (:repeat-map my-claude-code-map ("M" . claude-code-cycle-mode))
+     :custom (claude-code-terminal-backend #'vterm)
+     :config
+     ;; optional IDE integration with Monet
+     (add-hook 'claude-code-process-environment-functions
+  	     #'monet-start-server-function)
+     (monet-mode 1)
+
+     (claude-code-mode))
 
 #+end_src
