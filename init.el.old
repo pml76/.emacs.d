@@ -1,3 +1,9 @@
+;;; package --- Summary  -*- lexical-binding: t; -*-
+
+;;; Commentary:
+
+;; Package Manager Setup -------------------------------------------------------
+
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -17,7 +23,9 @@
 
 (straight-use-package 'use-package)
 
+;; Basic UI Configuration ------------------------------------------------------
 
+(defvar runemacs/default-font-size 180)
 
 (setq inhibit-startup-message t)
 
@@ -29,54 +37,38 @@
 (menu-bar-mode -1)          ; Disable the menu bar
 
 
+;; Font Configuration ----------------------------------------------------------
 
-(defvar pl/default-font-size 140)
-(defvar pl/default-font "JetBrains Mono")
-(defvar pl/variable-pitch-font "Source Serif 4")
-(defvar pl/variable-pitch-font-size 140)
-(defvar pl/fixed-pitch-font "JetBrains Mono")
-(defvar pl/fixed-pitch-font-size 140)
+(defun pl/set-font-faces ()
+  (message "Setting faces!")
+  ;(set-face-attribute 'default nil :font "JetBrains Mono" :weight 'light :height 180)
+  ;(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" :weight 'light :height 190)
+  ;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :weight 'light :height 1.3)
+  (set-face-attribute 'default nil :font "Fira Code" :height runemacs/default-font-size)
 
-(message "Setting faces!")
-
-(when (member pl/default-font (font-family-list))
-  (set-face-attribute 'default nil
-		      :font pl/default-font
-		      :height pl/default-font-size))
-
-(use-package mixed-pitch
-  :straight t
-  :config
-  (when (member pl/variable-pitch-font (font-family-list))
-    (set-face-attribute 'variable-pitch nil
-			:family pl/variable-pitch-font
-			:height pl/variable-pitch-font-size)))
-
-(when (member pl/fixed-pitch-font (font-family-list))
-  (set-face-attribute 'fixed-pitch nil
-		      :font pl/fixed-pitch-font
-		      :height pl/fixed-pitch-font-size))
-
-
+  ;; Set the fixed pitch face
+  (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height 260)
+  
+  ;; Set the variable pitch face
+  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 295 :weight 'regular))
 
 (defun pl/set-transparency ()
-"Set the transparency according to the platform."
-(cond
- ((eq system-type 'windows-nt)
-  (set-frame-parameter (selected-frame) 'alpha '(95 . 100))
-  (add-to-list 'default-frame-alist '(alpha . (95 . 100)))
-  (message "Running on Windows"))
- ((eq system-type 'gnu/linux)
-  (set-frame-parameter nil 'alpha-background 95)
-  (add-to-list 'default-frame-alist '(alpha-background . 95))
-  (message "Running on GNU/Linux"))
- (t
-  (message "Unknown operating system"))))
-
-
+  "Set the transparency according to the platform."
+  (cond
+   ((eq system-type 'windows-nt)
+    (set-frame-parameter (selected-frame) 'alpha '(95 . 100))
+    (add-to-list 'default-frame-alist '(alpha . (95 . 100)))
+    (message "Running on Windows"))
+   ((eq system-type 'gnu/linux)
+    (set-frame-parameter nil 'alpha-background 95)
+    (add-to-list 'default-frame-alist '(alpha-background . 95))
+    (message "Running on GNU/Linux"))
+   (t
+    (message "Unknown operating system"))))
 
 (defun pl/setup-gui ()
   "Setup the gui."
+  (pl/set-font-faces)
   (pl/set-transparency))
 
 (if (daemonp)
@@ -89,24 +81,19 @@
   (pl/setup-gui))
 
 
+;; Advanced UI Configuration --------------------------------------------------
 
 (use-package all-the-icons
   :straight t
   :if (display-graphic-p))
 
-
-
 (use-package nerd-icons
   :straight t)
-
-
 
 (use-package doom-modeline
   :straight t
   :after all-the-icons nerd-icons
   :init (doom-modeline-mode 1))
-
-
 
 (use-package doom-themes
   :straight t
@@ -131,6 +118,8 @@
 
 
 
+;; Utilities -------------------------------------------------------------------
+
 (use-package rainbow-delimiters
   :straight t
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -146,9 +135,6 @@
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-(add-hook 'c-mode                     #'enable-paredit-mode)
-(add-hook 'rustic-mode                #'enable-paredit-mode)
-
 
 
 
@@ -174,6 +160,10 @@
   ([remap describe-key] . helpful-key))
 
 
+
+
+;; Vertico & assocated packages ------------------------------------------
+
 (use-package vertico
   :straight t
   :custom
@@ -184,14 +174,10 @@
   :init
   (vertico-mode))
 
-
-
 (use-package savehist
   :straight t
   :init
   (savehist-mode))
-
-
 
 (use-package marginalia
   :straight t
@@ -209,8 +195,6 @@
   ;; the package.
   (marginalia-mode))
 
-
-
 (use-package orderless
   :straight t
   :custom
@@ -223,16 +207,12 @@
   (completion-pcm-leading-wildcard t))
 
 
-
 (use-package nerd-icons-completion
-:straight t
-:after nerd-icons
-:config
-(nerd-icons-completion-mode)
-(add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
-
-
-
+  :straight t
+  :after nerd-icons
+  :config
+  (nerd-icons-completion-mode)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
 (use-package corfu
   :straight t
@@ -262,8 +242,6 @@
   ;; (corfu-popupinfo-mode)
   )
 
-
-
 ;; Add extensions
 (use-package cape
   :straight t
@@ -287,8 +265,6 @@
   ;; ...
 )
 
-
-
 ;; Use Dabbrev with Corfu!
 (use-package dabbrev
   :straight t
@@ -301,7 +277,6 @@
   (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
-
 
 ;; A few more useful configurations...
 (use-package emacs
@@ -337,12 +312,11 @@
   (read-extended-command-predicate #'command-completion-default-include-p))
 
 
-
 (use-package consult
   :straight t
   ;; Replace bindings. Lazily loaded by `use-package'.
   :bind ;; C-c bindings in `mode-specific-map'
-  ("C-c M-x" . consult-mode-command)
+  ( ("C-c M-x" . consult-mode-command)
   ("C-c h" . consult-history)
   ("C-c k" . consult-kmacro)
   ("C-c m" . consult-man)
@@ -394,7 +368,7 @@
   :map minibuffer-local-map
   ("M-s" . consult-history) ;; orig. next-matching-history-element
   ("M-r" . consult-history) ;; orig. previous-matching-history-element
-
+  )
   ;; The :init configuration is always executed (Not lazy)
   :init
 
@@ -438,16 +412,6 @@
   ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
   )
 
-
-
-(use-package consult-lsp
-  :after (consult lsp-mode)
-  :bind (:map lsp-mode-map
-              ("C-c l s s" . consult-lsp-symbols)
-              ("C-c l s f" . consult-lsp-file-symbols)
-              ("C-c l s d" . consult-lsp-diagnostics)))
-
-
 (use-package embark
   :straight t
 
@@ -480,15 +444,19 @@
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
-                 (window-parameters (mode-line-format . none)))))  
+                 (window-parameters (mode-line-format . none)))))
 
-
+;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :straight t)
 
+;; Treemacs --------------------------------------------------------------------
 
 (use-package treemacs
   :straight t
+					;  :init
+					;  (with-eval-after-load 'winum
+					;    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :config
   (progn
     (setq treemacs-buffer-name-function            #'treemacs-default-buffer-name
@@ -576,21 +544,15 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
-(treemacs-start-on-boot)
-
-
-
 (use-package treemacs-projectile
-:straight t
-:after (treemacs projectile)
-:ensure t)
-
+  :straight t
+  :after (treemacs projectile)
+  :ensure t)
 
 (use-package treemacs-icons-dired
   :straight t
   :hook (dired-mode . treemacs-icons-dired-enable-once)
   :ensure t)
-
 
 (use-package treemacs-magit
   :straight t
@@ -601,15 +563,20 @@
 ;  :after (treemacs perspective) ;;or perspective vs. persp-mode
 ;  :config (treemacs-set-scope-type 'Perspectives))
 
-
-
 (use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
   :straight t
   :after (treemacs)
   :config (treemacs-set-scope-type 'Tabs))
 
+(treemacs-start-on-boot)
 
 
+;; perspective ---------------------------------------------------------
+
+					;(use-package perspective
+					;  :straight t)
+
+;; magit ---------------------------------------------------------------
 
 (use-package magit
   :straight t
@@ -618,7 +585,7 @@
 
 (setenv "GIT_ASKPASS" "git-gui--askpass")
 
-
+;; projectile ----------------------------------------------------------
 
 (use-package projectile
   :straight t
@@ -632,9 +599,10 @@
   (setq projectile-switch-project-action #'projectile-dired))
 
 
+;; lsp-mode ------------------------------------------------------------
 
 (defun pl/lsp-mode-setup ()
-  (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
 
 
@@ -658,14 +626,20 @@
   :commands (lsp lsp-deferred))
 
 
-
-(cond
+(defun pl/when-linux-install ()
+  (cond
    ((eq system-type 'gnu/linux)
     ;; nix-mode ------------------------------------------------------------
 
+    (use-package nix-mode
+      :straight t
+      :mode "\\.nix\\'")
+    
     (use-package dap-mode
       :straight t
       :config
+
+      (require 'dap-cpptools)
 
       (require 'dap-gdb)
       (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
@@ -691,32 +665,23 @@
       ;;        :name "LLDB::Run"))
       
       )
-    ))
+    )))
 
-
-(cond
- ((eq system-type 'gnu/linux)
-  ;; nix-mode ------------------------------------------------------------
-  
-  (use-package nix-mode
-    :straight t
-    :mode "\\.nix\\'")))
-
-
+(pl/when-linux-install)
 
 (use-package lsp-ui
   :straight t
-  :after lsp-mode
   :commands lsp-ui-mode)
 
-
+(use-package consult-lsp
+  :straight t)
 
 (use-package flycheck
   :straight t
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
-
+;; cmake-mode ------------------------------------------------
 
 (use-package cmake-mode
   :straight t
@@ -724,47 +689,40 @@
   ((cmake-mode . lsp)))
 
 
-  
+
+;; Org Mode Configuration ------------------------------------------------------
+
 (defun pl/org-font-setup ()
   ;; Replace list hyphen with dot
   (font-lock-add-keywords 'org-mode
-			  '(("^ *\\([-]\\) "
-			     (0 (prog1 () (compose-region
-					   (match-beginning 1)
-					   (match-end 1) "•   "))))))
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
   ;; Set faces for heading levels
   (dolist (face '((org-level-1 . 1.2)
-		  (org-level-2 . 1.1)
+                  (org-level-2 . 1.1)
                   (org-level-3 . 1.05)
-		  (org-level-4 . 1.0)
-		  (org-level-5 . 1.1)
-		  (org-level-6 . 1.1)
-		  (org-level-7 . 1.1)
-		  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil
-			:family pl/variable-pitch-font
-			:weight 'regular
-			:height (cdr face)))
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
 
-  ;; Ensure that anything that should be fixed-pitch in Org files
-  ;; appears that way
-  (set-face-attribute 'org-block nil
-		      :foreground 'unspecified
-		      :inherit 'fixed-pitch)
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground 'unspecified :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil
-		      :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil
-		      :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
 (defun pl/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
   (visual-line-mode 1))
+
 
 (use-package org
   :straight t
@@ -782,12 +740,11 @@
    (org-log-into-drawer t)
    (org-todo-keywords
     '((sequence "TODO(t)" "NEXT(n)" "|"  "DONE(!d)")
-      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)"
-		"REVIEW(v)" "WAIT(w@/!" "HOLD(h)" "|"
-		"COMPLETED(c)" "CANC(k@)")))
+      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
    (org-tag-alist
     '((:startgroup)
+       ; Put mutually exclusive tags here
        (:endgroup)
        ("@errand" . ?E)
        ("@home" . ?H)
@@ -802,13 +759,13 @@
    (org-refile-targets
     '(("~/Org-Agenda/Archive.org" :maxlevel . 1)))
 
+   
    (org-agenda-custom-commands
     '(("d" "Dashboard"
        ((agenda "" ((org-deadline-warning-days 7)))
 	(todo "NEXT"
               ((org-agenda-overriding-header "Next Tasks")))
-	(tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header
-				     "Active Projects")))))
+	(tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
       ("n" "Next Tasks"
        ((todo "NEXT"
@@ -859,6 +816,7 @@
 	   ("jj" "Journal" entry
             (file+olp+datetree "~/Org-Agenda/Journal.org")
             "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+            ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
             :clock-in :clock-resume
             :empty-lines 1)
 	   ("jm" "Meeting" entry
@@ -868,14 +826,11 @@
             :empty-lines 1)
 
 	   ("w" "Workflows")
-	   ("we" "Checking Email" entry
-	    (file+olp+datetree "~/Org-Agenda/Journal.org")
-	    "* Checking Email :email:\n\n%?"
-	    :clock-in :clock-resume :empty-lines 1)
+	   ("we" "Checking Email" entry (file+olp+datetree "~/Org-Agenda/Journal.org")
+            "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
 	   ("m" "Metrics Capture")
-	   ("mw" "Weight" table-line
-	    (file+headline "~/Org-Agenda/Metrics.org" "Weight")
+	   ("mw" "Weight" table-line (file+headline "~/Org-Agenda/Metrics.org" "Weight")
 	    "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
 
    (setq org-habit-graph-column 60))
@@ -912,11 +867,8 @@
   ;; Optional: Alias the execute function to use rustic's implementation
   (defalias 'org-babel-execute:rust #'org-babel-execute:rustic))
 
-
-
 (use-package org-contrib
   :straight t)
-
 
 (use-package org-bullets
   :straight t
@@ -924,7 +876,6 @@
   :hook (org-mode . org-bullets-mode)
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
 
 (defun pl/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
@@ -935,13 +886,12 @@
   :straight t
   :hook (org-mode . pl/org-mode-visual-fill))
 
-
-
 ;; org-store-link, org-agenda, and org-capture should be
 ;; reachable from anywhere
 (global-set-key (kbd "C-c l") #'org-store-link)
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
+
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -949,29 +899,38 @@
    (python . t)))
 
 
+;; rustic ----------------------------------------------------
+
+(defun pl/setup-rust-development ()
+  "Setup for rust development. 
+This routine will should be linked
+to a hook that is triggered when rustic-mode is entered."
+  (require 'dap-gdb)
+  (with-suppressed-warnings ((free-vars dap-gdb-debug-program))
+    (setq dap-gdb-debug-program '("rust-gdb" "-i" "dap"))))
 
 (use-package yasnippet
   :straight t)
-
-
 
 (use-package rust-mode
   :straight t
   :init
   (setq rust-mode-treesitter-derive t))
 
-
-
 (use-package flymake
   :straight t
   :hook (rustic-mode . flymake-mode))
-
-
 
 (use-package rustic
   :straight t
   :after flymake
   :after rust-mode
+					;  :hook (rustic-mode . pl/setup-rust-development)
   :config
   (require 'rustic-babel))
 
+
+
+
+
+;;; init.el ends here
