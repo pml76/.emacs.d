@@ -918,12 +918,21 @@
   :straight t)
 
 
-(use-package org-bullets
+
+(use-package org-modern
   :straight t
   :after org
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq org-modern-block-fringe nil
+	org-modern-star 'replace))
+
+;; (use-package org-bullets
+;;   :straight t
+;;   :after org
+;;   :hook (org-mode . org-bullets-mode)
+;;   :custom
+;;   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 
 (defun pl/org-mode-visual-fill ()

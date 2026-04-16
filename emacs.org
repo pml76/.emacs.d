@@ -1245,12 +1245,21 @@ TODO: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
 [[https://github.com/sabof/org-bullets][org-bullets]] is a purely cosmetic Emacs package that replaces the default asterisk (*) heading markers in Org-mode with prettier UTF-8 Unicode bullet symbols. It makes Org documents look more visually polished without changing any of the underlying structure or functionality.
 
 #+begin_src emacs-lisp
-  (use-package org-bullets
+
+  (use-package org-modern
     :straight t
     :after org
-    :hook (org-mode . org-bullets-mode)
-    :custom
-    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+    :hook (org-mode . org-modern-mode)
+    :config
+    (setq org-modern-block-fringe nil
+  	org-modern-star 'replace))
+
+  ;; (use-package org-bullets
+  ;;   :straight t
+  ;;   :after org
+  ;;   :hook (org-mode . org-bullets-mode)
+  ;;   :custom
+  ;;   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 #+end_src
 
