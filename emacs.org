@@ -4,12 +4,7 @@
 
 * straight.el Setup
 
-straight.el is a package manager for emacs that is
-
- - compatible with use-package,
- - allows to pin down the version of each package it installs, and
- - downloads the source code of each package it installs and compiles it.
-
+[[https://github.com/radian-software/straight.el][straight.el]] is a next-generation package manager for Emacs that replaces the built-in package.el. Instead of downloading pre-built tarballs, it installs packages by cloning their Git repositories directly, giving you precise control over versions. This makes your Emacs configuration fully reproducible — you can lock packages to exact commits and share a consistent setup across machines. It also makes local package development easy, since you're just editing the live Git checkout. It integrates well with use-package as a drop-in alternative to :ensure.
 
  The following code snippet downloads and installs straight.el. In case this does not work one can clone the straight.el repo from github into ~/.emacs.d/straight/repos.
 
@@ -135,24 +130,61 @@ We have to make sure that a frame is set up when we are in running in a daemon.
 
 * Advanced UI configuration
 
-I use /doom-modeline/ and /doom-themes/ since these two are nicely integrated and the colors match a wide a range of needs and packages.
+** all-the-icons
 
-In addition I load the /all-the-icons/ and /nerd-icons/ to have them as well.
+[[https://github.com/domtronn/all-the-icons.el][all-the-icons]] is an Emacs library that provides icon rendering using several icon fonts (FontAwesome, Material Design Icons, file-icons, etc.), allowing other packages to display icons in the modeline, file explorers, and elsewhere. It was the dominant icon library for Emacs before being largely superseded by nerd-icons.
 
 #+begin_src emacs-lisp
-  
+
   (use-package all-the-icons
     :straight t
     :if (display-graphic-p))
 
+#+end_src
+
+
+** nerd-icons
+
+[[https://github.com/rainstormstudio/nerd-icons.el][nerd-icons]] is an Emacs library that renders icons from Nerd Fonts within Emacs buffers and UI elements. It is used as a dependency by other packages (like doom-modeline and dirvish) to display file type icons, mode indicators, and other glyphs. It requires a Nerd Font to be installed on your system to display correctly.
+
+#+begin_src emacs-lisp
+
   (use-package nerd-icons
     :straight t)
+
+#+end_src
+
+
+** doom-modeline
+
+[[https://github.com/seagle0128/doom-modeline][doom-modeline]] is a fancy, minimal modeline (the status bar at the bottom of Emacs windows) inspired by Doom Emacs. It provides a sleek, icon-rich modeline that displays useful information such as:
+
+- Current buffer name and modification status
+- Git branch and diff statistics (via magit/git-gutter)
+- Major mode with an optional icon
+- Line/column number and buffer position
+- LSP/flycheck/flymake error and warning counts
+- Active virtual environment (Python, etc.)
+- Battery, time, and other optional segments
+
+It relies on nerd-icons (or previously all-the-icons) for the icons, and is designed to be fast and lightweight compared to heavier alternatives like Spaceline. Like doom-themes, it originated in Doom Emacs but works as a standalone package in any Emacs configuration.
+
+#+begin_src emacs-lisp
 
   (use-package doom-modeline
     :straight t
     :after all-the-icons nerd-icons
     :init (doom-modeline-mode 1))
 
+#+end_src
+
+
+** doom-themes
+
+[[https://github.com/doomemacs/themes][doom-themes]] is a collection of Emacs themes inspired by Doom Emacs. It provides a set of carefully crafted color themes (like doom-one, doom-dracula, doom-molokai, etc.) with consistent styling across many major and minor modes. It also includes optional extras like org-mode fontification tweaks and neotree/treemacs icon support. The package originated from the Doom Emacs configuration framework but works as a standalone package in any Emacs setup.
+
+#+begin_src emacs-lisp
+  
   (use-package doom-themes
     :straight t
     :custom
@@ -180,7 +212,7 @@ In addition I load the /all-the-icons/ and /nerd-icons/ to have them as well.
 
 ** Rainbow delimiters
 
-For easier judgement what parans are matching when programmin, especially usefull for lisp.
+[[https://github.com/Fanael/rainbow-delimiters][rainbow-delimiters]] is an Emacs minor mode that colorizes nested parentheses, brackets, and braces by depth — each nesting level gets a distinct color, making it much easier to visually match pairs and understand code structure. It's especially popular in Lisp-family languages.
 
 #+begin_src emacs-lisp
 
@@ -192,7 +224,7 @@ For easier judgement what parans are matching when programmin, especially useful
 
 ** Paredit
 
-Automatize paran management
+[[https://www.emacswiki.org/emacs/ParEdit][paredit]] is a minor mode for structured editing of Lisp code. Its core idea is that parentheses (and other delimiters) are always kept balanced — you can never accidentally create mismatched pairs. It provides commands for navigating, slurping (pulling in neighboring expressions), barfing (pushing out expressions), splitting, joining, and raising S-expressions, making it much easier to reshape Lisp code structurally rather than editing raw characters.
 
 #+begin_src emacs-lisp
   (use-package paredit
@@ -210,9 +242,12 @@ Automatize paran management
 
 #+end_src
 
-** WhichKey
 
-Shows all the short-cuts in the mini-buffer
+
+** which-key
+
+[[https://github.com/justbur/emacs-which-key][which-key]] is a minor mode that displays a popup showing available keybindings whenever you pause after entering an incomplete key sequence. For example, if you press C-x and wait a moment, a panel appears listing all the commands accessible from that prefix. It's a great discoverability tool, especially for users still learning Emacs keybindings. As of Emacs 30.1, it is included with Emacs itself and no longer needs to be installed separately.
+
 
 #+begin_src emacs-lisp
 
@@ -862,8 +897,8 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
 
 #+begin_src emacs-lisp
 
-    (defun pl/lsp-mode-setup ()
-      (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (defun pl/lsp-mode-setup ()
+    (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
     (lsp-headerline-breadcrumb-mode))
 
 
@@ -886,21 +921,21 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
      (lsp-mode . lsp-enable-which-key-integration))
     :commands (lsp lsp-deferred))
 
+#+end_src
 
-  (defun pl/when-linux-install ()
-    (cond
+** dap-mode
+
+[[https://github.com/emacs-lsp/dap-mode][dap-mode]] is an Emacs client for the Debug Adapter Protocol (DAP), which is to debugging what LSP is to language intelligence. It brings a full IDE-like debugging experience into Emacs, supporting breakpoints, step execution, a locals/variables inspector, watch expressions, and a debug REPL. It works with many languages including Python, Java, C/C++, Ruby, and Elixir, and supports launch.json files from VS Code projects. It is part of the same ecosystem as lsp-mode.
+
+#+begin_src emacs-lisp
+
+  (cond
      ((eq system-type 'gnu/linux)
       ;; nix-mode ------------------------------------------------------------
 
-      (use-package nix-mode
-        :straight t
-        :mode "\\.nix\\'")
-      
       (use-package dap-mode
         :straight t
         :config
-
-        (require 'dap-cpptools)
 
         (require 'dap-gdb)
         (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
@@ -926,17 +961,64 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
         ;;        :name "LLDB::Run"))
         
         )
-      )))
+      ))
+#+end_src
 
-  (pl/when-linux-install)
+
+** nix-mode
+
+[[https://github.com/NixOS/nix-mode][nix-mode]] is an Emacs major mode for editing Nix expressions (.nix files). It provides syntax highlighting, indentation, and basic integration with the Nix toolchain — including building projects, interacting with Nix flakes via a magit-style interface, and browsing the Nix store. It's the standard choice for anyone working with NixOS or Nix package definitions in Emacs.
+
+#+begin_src emacs-lisp
+
+  (cond
+   ((eq system-type 'gnu/linux)
+    ;; nix-mode ------------------------------------------------------------
+    
+    (use-package nix-mode
+      :straight t
+      :mode "\\.nix\\'")))
+
+#+end_src
+
+
+** lsp-ui
+
+[[https://github.com/emacs-lsp/lsp-ui][lsp-ui]] is a companion package to lsp-mode that adds a rich visual layer on top of it. It provides inline sideline hints showing diagnostics and code actions next to the relevant lines, floating documentation popups at point, and a VS Code-style "peek" UI for finding definitions and references without leaving the current buffer. Essentially it takes the raw data from lsp-mode and presents it in a more polished, IDE-like way.
+
+#+begin_src emacs-lisp
 
   (use-package lsp-ui
     :straight t
+    :after lsp-mode
     :commands lsp-ui-mode)
+
+#+end_src
+
+
+** flycheck
+
+[[https://github.com/flycheck/flycheck][flycheck]] is a modern on-the-fly syntax checking extension for Emacs, intended as a replacement for the built-in flymake. As you type, it automatically runs external linters, compilers, or interpreters on your buffer and highlights errors and warnings inline. It supports a wide range of languages out of the box and has a large ecosystem of third-party checker plugins for additional languages and tools.
+
+#+begin_src emacs-lisp
 
   (use-package flycheck
     :straight t
     :config
     (add-hook 'after-init-hook #'global-flycheck-mode))
+
+#+end_src
+
+
+** cmake-mode
+
+[[https://github.com/Kitware/CMake/blob/master/Auxiliary/cmake-mode.el][cmake-mode]] is a major mode for editing CMake files (CMakeLists.txt and *.cmake). It provides syntax highlighting, indentation, and comment formatting for CMake's scripting language. It is maintained by Kitware, the creators of CMake, and is distributed as part of the official CMake project.
+
+#+begin_src emacs-lisp
+
+  (use-package cmake-mode
+    :straight t
+    :hook
+    ((cmake-mode . lsp)))
   
 #+end_src

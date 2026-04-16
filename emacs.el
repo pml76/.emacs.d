@@ -94,13 +94,19 @@
   :straight t
   :if (display-graphic-p))
 
+
+
 (use-package nerd-icons
   :straight t)
+
+
 
 (use-package doom-modeline
   :straight t
   :after all-the-icons nerd-icons
   :init (doom-modeline-mode 1))
+
+
 
 (use-package doom-themes
   :straight t
@@ -627,8 +633,8 @@
 
 
 
-  (defun pl/lsp-mode-setup ()
-    (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+(defun pl/lsp-mode-setup ()
+  (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
 
 
@@ -652,20 +658,14 @@
   :commands (lsp lsp-deferred))
 
 
-(defun pl/when-linux-install ()
-  (cond
+
+(cond
    ((eq system-type 'gnu/linux)
     ;; nix-mode ------------------------------------------------------------
 
-    (use-package nix-mode
-      :straight t
-      :mode "\\.nix\\'")
-    
     (use-package dap-mode
       :straight t
       :config
-
-      (require 'dap-cpptools)
 
       (require 'dap-gdb)
       (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
@@ -691,13 +691,25 @@
       ;;        :name "LLDB::Run"))
       
       )
-    )))
+    ))
 
-(pl/when-linux-install)
+
+(cond
+ ((eq system-type 'gnu/linux)
+  ;; nix-mode ------------------------------------------------------------
+  
+  (use-package nix-mode
+    :straight t
+    :mode "\\.nix\\'")))
+
+
 
 (use-package lsp-ui
   :straight t
+  :after lsp-mode
   :commands lsp-ui-mode)
+
+
 
 (use-package flycheck
   :straight t
