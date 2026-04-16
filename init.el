@@ -924,15 +924,19 @@
   :after org
   :hook (org-mode . org-modern-mode)
   :config
-  (setq org-modern-block-fringe nil
+  (setq org-modern-block-fringe t
 	org-modern-star 'replace))
 
-;; (use-package org-bullets
-;;   :straight t
-;;   :after org
-;;   :hook (org-mode . org-bullets-mode)
-;;   :custom
-;;   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+
+(use-package org-appear
+  :straight t
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autosubmarkers t
+        org-appear-autoentities t
+        org-appear-autolinks t
+        org-appear-inside-latex t))
 
 
 (defun pl/org-mode-visual-fill ()

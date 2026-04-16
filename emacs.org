@@ -1240,9 +1240,9 @@ TODO: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
 
 #+end_src
 
-** org-bullets
+** org-modern
 
-[[https://github.com/sabof/org-bullets][org-bullets]] is a purely cosmetic Emacs package that replaces the default asterisk (*) heading markers in Org-mode with prettier UTF-8 Unicode bullet symbols. It makes Org documents look more visually polished without changing any of the underlying structure or functionality.
+[[https://github.com/minad/org-modern][org-modern]] is a visual styling package for Emacs Org-mode that gives buffers a clean, modern appearance by prettifying headlines, keywords, tags, tables, timestamps, and source blocks — all using efficient text properties rather than images. It's essentially a more comprehensive and capable replacement for older packages like org-bullets and org-superstar, and is highly configurable so you can enable or disable styling for individual elements.
 
 #+begin_src emacs-lisp
 
@@ -1251,18 +1251,28 @@ TODO: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
     :after org
     :hook (org-mode . org-modern-mode)
     :config
-    (setq org-modern-block-fringe nil
+    (setq org-modern-block-fringe t
   	org-modern-star 'replace))
-
-  ;; (use-package org-bullets
-  ;;   :straight t
-  ;;   :after org
-  ;;   :hook (org-mode . org-bullets-mode)
-  ;;   :custom
-  ;;   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
+  
 #+end_src
 
+
+** org-appear
+
+[[https://github.com/awth13/org-appear][org-appear]] toggles the visibility of Org-mode markup elements depending on where your cursor is. When you move the cursor into an emphasized region (e.g. bold, italic), a link, or a subscript, the underlying syntax markers are revealed for easy editing — then hidden again when the cursor moves away. This gives you the best of both worlds: a clean, rendered appearance when reading and full access to the raw markup when editing.
+
+#+begin_src emacs-lisp
+
+  (use-package org-appear
+    :straight t
+    :hook (org-mode . org-appear-mode)
+    :config
+    (setq org-appear-autosubmarkers t
+          org-appear-autoentities t
+          org-appear-autolinks t
+          org-appear-inside-latex t))
+
+#+end_src
 
 ** visual-fill-column
 
