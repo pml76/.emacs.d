@@ -1022,3 +1022,19 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
     ((cmake-mode . lsp)))
   
 #+end_src
+
+
+* org-mode
+
+[[https://orgmode.org/][Org-mode]] is a powerful Emacs package for note-taking, organizing, and authoring using plain text files. Its main features:
+
+  - Outlining & notes — hierarchical document structure with headings and subheadings
+  - TODO lists & GTD — task management with priorities, deadlines, tags, and nested checklists
+  - Literate programming / Babel — embed and execute code blocks in many languages directly in documents
+  - Spreadsheets — basic table calculations inside plain text
+  - Export — convert documents to HTML, LaTeX, PDF, OpenDocument, Markdown, and more
+  - Agenda — collect TODOs and deadlines from multiple files into a unified calendar view
+
+    #+begin_src emacs-lisp
+
+    #+end_src
