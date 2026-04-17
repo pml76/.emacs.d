@@ -2,31 +2,6 @@
 
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
-  Bugs / Key Binding Conflicts
-
-  1. C-c c is double-bound — org-capture (line 957) and claude-code-command-map (line 1024) both claim it. One will silently shadow the other.
-  2. C-c l is double-bound — lsp-keymap-prefix "C-c l" (line 647) and org-store-link (line 955) conflict.
-  3. C-c p is double-bound — cape-prefix-map (line 272) and projectile-command-map (line 628) conflict.
-  4. Typo in doom-themes custom vars (lines 114–115):
-  (doom-themes-enabe bold t)    ;; should be doom-themes-enable-bold
-  (doom-themes enable-italic t) ;; should be doom-themes-enable-italic (missing hyphen)
-  4. These silently do nothing — bold/italic are never enabled.
-  5. setq inside :custom (line 881):
-  (setq org-habit-graph-column 60) ;; wrong — should just be (org-habit-graph-column 60)
-  6. Wrong variable name in pl/lsp-mode-setup (line 637):
-  (setq pl/lsp-headerline-breadcrumb-segments ...) ;; should be lsp-headerline-breadcrumb-segments
-  6. The pl/ prefix means this sets a custom variable that lsp-mode never reads.
-
-  Minor Issues
-
-  7. read-extended-command-predicate set twice in the use-package emacs block (lines 318 and 336) — the second one wins, the first is dead.
-  8. consult-lsp missing :straight t (line 443) — will fail on a fresh install.
-  9. (use-package emacs :straight t) — emacs is built-in; :straight t is harmless but misleading.
-  10. Two separate cond ((eq system-type 'gnu/linux) ...) blocks (lines 662 and 697) — could be merged into one.
-  11. (treemacs-start-on-boot) called at top level (line 579) — should be inside the use-package treemacs :config block to ensure it runs only after treemacs loads.
-
-  The key binding conflicts (#1–3) and the doom-themes typos (#4) are the most impactful to fix. Want me to apply any of these?
-
 
 * straight.el Setup
 
@@ -1272,7 +1247,7 @@ TODO: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
     :after org
     :hook (org-mode . org-modern-mode)
     :config
-    (setq org-modern-block-fringe t
+    (setq org-modern-block-fringe nil
   	org-modern-star 'replace))
   
 #+end_src
@@ -1385,32 +1360,76 @@ TODO: https://robert.kra.hn/posts/rust-emacs-setup/
 
 * Claude-code
 
+** inheritenv
+
+The [[https://github.com/purcell/inheritenv][inheritenv]] Emacs package (by Steve Purcell) fixes a common annoyance where Emacs commands that spawn subprocesses in temporary buffers ignore the buffer-local environment of the buffer you invoked them from. Normally, things like shell-command-to-string always use Emacs-wide defaults for process-environment and exec-path, which means tools set up per-project (e.g. via envrc, direnv, or with-editor) can be missed — leading to "executable not found" errors or the wrong version of a binary being used.
+
+The package provides two main tools: an inheritenv macro that library authors can wrap around code running processes in temp buffers so those processes inherit the caller's buffer-local env, and an inheritenv-add-advice macro that end users can apply to existing commands (like shell-command-to-string) to retrofit the same behavior.
+
 #+begin_src emacs-lisp
 
      ;; install required inheritenv dependency:
    (use-package inheritenv
      :straight (:type git :host github :repo "purcell/inheritenv"))
 
-   ;; for eat terminal backend:
-   (use-package eat
-     :straight (:type git
-                      :host codeberg
-                      :repo "akib/emacs-eat"
-                      :files ("*.el" ("term" "term/*.el") "*.texi"
-                              "*.ti" ("terminfo/e" "terminfo/e/*")
-                              ("terminfo/65" "terminfo/65/*")
-                              ("integration" "integration/*")
-                              (:exclude ".dir-locals.el" "*-tests.el"))))
+#+end_src
 
+
+** eat
+
+The [[https://codeberg.org/akib/emacs-eat][eat]] Emacs package (short for "Emulate A Terminal," by Akib Azmain Turja) is a terminal emulator written entirely in Emacs Lisp. Despite being pure Elisp, it's notably fast — reportedly more than three times faster than the built-in term — and can run most full-screen terminal programs, including Emacs itself.
+Its main selling points are complete mouse support, clipboard integration between Emacs and the terminal, reduced flickering, and tight integration with Eshell (so you can run full-screen TUI programs like htop or vim directly inside Eshell). It's available on NonGNU ELPA via M-x package-install RET eat RET.
+
+#+begin_src emacs-lisp
+
+  ;; form eat terminal backend:
+  (use-package eat
+    :straight (:type git
+                     :host codeberg
+                     :repo "akib/emacs-eat"
+                     :files ("*.el" ("term" "term/*.el") "*.texi"
+                             "*.ti" ("terminfo/e" "terminfo/e/*")
+                             ("terminfo/65" "terminfo/65/*")
+                             ("integration" "integration/*")
+  			   (:exclude ".dir-locals.el" "*-tests.el"))))
+#+end_src
+
+** vterm
+
+The [[https://github.com/akermu/emacs-libvterm][vterm]] Emacs package (emacs-libvterm, by akermu) is a fully-featured terminal emulator for Emacs built on top of libvterm, a C library. Because the heavy lifting happens in compiled code rather than Elisp, it's dramatically faster than built-ins like term, ansi-term, or shell — rendering text up to two orders of magnitude faster and handling large outputs smoothly.
+
+It supports essentially all of xterm's escape codes, so it runs ncurses programs like vim, htop, tmux, etc. without issues — basically feeling like a standalone terminal inside an Emacs buffer. It can also track the current directory and shell prompt (with some shell-side setup), and supports a message-passing mechanism that lets shell commands invoke Emacs functions (e.g. open files in the running Emacs). The main trade-off is that it requires a C module to be compiled, and it's not as deeply Emacs-native as Eshell, so some of Emacs's usual editing keybindings don't apply inside the buffer.
+
+#+begin_src emacs-lisp
    ;; for vterm terminal backend:
    (use-package vterm :straight t)
 
+#+end_src
 
+
+** monet
+
+The [[https://github.com/stevemolitor/claude-code.el][monet]] Emacs package (by Steve Molitor) implements the Claude Code IDE protocol for Emacs. It runs a WebSocket server that the Claude Code CLI connects to, giving Claude IDE-level awareness of your Emacs session: the current selection is automatically sent to Claude, and Claude can open files, show diffs, retrieve diagnostics, and do go-to-definition through Emacs rather than operating blindly at the filesystem level.
+
+It's typically paired with claude-code.el (also by Steve Molitor) — when you start a Claude Code session, Monet spins up the IDE-protocol server so the CLI-side Claude and your Emacs editor stay in sync, effectively turning Emacs into a proper IDE frontend for Claude Code (analogous to the VS Code / JetBrains integrations).
+
+
+#+begin_src emacs-lisp
   (use-package monet :straight ( :type git
   			       :host github
   			       :repo "stevemolitor/monet"))
 
-   ;; install claude-code.el, using :depth 1 to reduce download size:
+#+end_src
+
+
+** claude-code
+
+The [[https://deepwiki.com/stevemolitor/claude-code.el][claude-code.el]] Emacs package (by Steve Molitor) is an Emacs integration for Anthropic's Claude Code CLI. It runs the Claude Code command-line tool inside an Emacs terminal buffer (using eat or vterm) so you can chat with Claude, have it read and edit files, run shell commands, execute tests, manipulate git, etc., all without leaving Emacs.
+
+Notable features include a command interface with convenient bindings (e.g. C-c c c to launch Claude in the current project root), multi-instance management across different projects and directories, session persistence across Emacs restarts so conversations can be resumed, and project-aware context where Claude can see the whole directory tree. It also supports an optional integration with the monet package to add IDE-level features like sending the current selection to Claude, showing diffs in Emacs, and go-to-definition inside Claude sessions.
+
+#+begin_src emacs-lisp
+  ;; install claude-code.el, using :depth 1 to reduce download size:
    (use-package claude-code
      :straight (:type git
    		   :host github
@@ -1430,5 +1449,4 @@ TODO: https://robert.kra.hn/posts/rust-emacs-setup/
      (monet-mode 1)
 
      (claude-code-mode))
-
 #+end_src
