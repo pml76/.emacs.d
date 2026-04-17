@@ -199,7 +199,7 @@ It relies on nerd-icons (or previously all-the-icons) for the icons, and is desi
 
   (use-package doom-modeline
     :straight t
-    :after all-the-icons nerd-icons
+    :after (all-the-icons nerd-icons)
     :init (doom-modeline-mode 1))
 
 #+end_src
@@ -214,8 +214,8 @@ It relies on nerd-icons (or previously all-the-icons) for the icons, and is desi
   (use-package doom-themes
     :straight t
     :custom
-    (doom-themes-enabe bold t)    ; if nil, bold is universally disabled
-    (doom-themes enable-italic t) ; if nil, italics are universally disabled
+    (doom-themes-enable-bold t)    ; if nil, bold is universally disabled
+    (doom-themes-enable-italic t) ; if nil, italics are universally disabled
 
     ;; use "doom-atom" for less minimal icon theme
     (doom-themes-treemacs-theme "doom-atom")
@@ -263,8 +263,8 @@ It relies on nerd-icons (or previously all-the-icons) for the icons, and is desi
   (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
   (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
   (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-  (add-hook 'c-mode                     #'enable-paredit-mode)
-  (add-hook 'rustic-mode                #'enable-paredit-mode)
+  ;; (add-hook 'c-mode-hook                #'enable-paredit-mode)
+  (add-hook 'rustic-mode-hook           #'enable-paredit-mode)
 
 #+end_src
 
@@ -300,9 +300,7 @@ Better help sites for elisp function used by emacs.
     :bind
     ("C-h f" . helpful-callable)
     ("C-h v" . helpful-variable)
-    ([remap describe-function] . counsel-describe-function)
     ([remap describe-command] . helpful-command)
-    ([remap describe-variable] . counsel-describe-variable)
     ([remap describe-key] . helpful-key))
 #+end_src
 
@@ -452,7 +450,7 @@ Better help sites for elisp function used by emacs.
     :straight t
     ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
     ;; Press C-c p ? to for help.
-    :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
+    :bind ("C-c C-p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
     ;; Alternatively bind Cape commands individually.
     ;; :bind (("C-c p d" . cape-dabbrev)
     ;;        ("C-c p h" . cape-history)
@@ -501,7 +499,6 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
 #+begin_src emacs-lisp
   ;; A few more useful configurations...
   (use-package emacs
-    :straight t
     :custom
     ;; Enable context menu. `vertico-multiform-mode´ adds a menu in the minibuf
     ;; to switch display modes.
@@ -525,12 +522,7 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
     
     ;; Emacs 30 and newer: Disable Ispell completion function.
     ;; Try `cape-dict' as an alternative.
-    (text-mode-ispell-word-completion nil)
-    
-    ;; Hide commands in M-x which do not apply to the current mode.  Corfu
-    ;; commands are hidden, since they are not used via M-x. This setting is
-    ;; useful beyond Corfu.
-    (read-extended-command-predicate #'command-completion-default-include-p))
+    (text-mode-ispell-word-completion nil))
 
 #+end_src
 
@@ -651,6 +643,7 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
 #+begin_src emacs-lisp
 
   (use-package consult-lsp
+    :straight t
     :after (consult lsp-mode)
     :bind (:map lsp-mode-map
                 ("C-c l s s" . consult-lsp-symbols)
@@ -718,96 +711,95 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
 [[https://github.com/Alexander-Miller/treemacs][Treemacs]] is a tree-style file and project explorer for Emacs, similar to VS Code's file sidebar or Vim's NERDTree. It displays your projects and their file hierarchies in a persistent side panel, with support for git status highlighting, file tags via Imenu, mouse interaction, and auto-refresh on filesystem changes. It also saves and restores your workspace between sessions, and integrates with LSP via lsp-treemacs.
 
 #+begin_src emacs-lisp
-(use-package treemacs
-  :straight t
-  :config
-  (progn
-    (setq treemacs-buffer-name-function            #'treemacs-default-buffer-name
-          treemacs-buffer-name-prefix              " *Treemacs-Buffer-"
-          treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
-          treemacs-deferred-git-apply-delay        0.5
-          treemacs-directory-name-transformer      #'identity
-          treemacs-display-in-side-window          t
-          treemacs-eldoc-display                   'simple
-          treemacs-file-event-delay                2000
-          treemacs-file-extension-regex            treemacs-last-period-regex-value
-          treemacs-file-follow-delay               0.2
-          treemacs-file-name-transformer           #'identity
-          treemacs-follow-after-init               t
-          treemacs-expand-after-init               t
-          treemacs-find-workspace-method           'find-for-file-or-pick-first
-          treemacs-git-command-pipe                ""
-          treemacs-goto-tag-strategy               'refetch-index
-          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
-          treemacs-hide-dot-git-directory          t
-          treemacs-hide-dot-jj-directory           t
-          treemacs-indentation                     2
-          treemacs-indentation-string              " "
-          treemacs-is-never-other-window           nil
-          treemacs-max-git-entries                 5000
-          treemacs-missing-project-action          'ask
-          treemacs-move-files-by-mouse-dragging    t
-          treemacs-move-forward-on-expand          nil
-          treemacs-no-png-images                   nil
-          treemacs-no-delete-other-windows         t
-          treemacs-project-follow-cleanup          nil
-          treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-          treemacs-position                        'left
-          treemacs-read-string-input               'from-child-frame
-          treemacs-recenter-distance               0.1
-          treemacs-recenter-after-file-follow      nil
-          treemacs-recenter-after-tag-follow       nil
-          treemacs-recenter-after-project-jump     'always
-          treemacs-recenter-after-project-expand   'on-distance
-          treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
-          treemacs-project-follow-into-home        nil
-          treemacs-show-cursor                     nil
-          treemacs-show-hidden-files               t
-          treemacs-silent-filewatch                nil
-          treemacs-silent-refresh                  nil
-          treemacs-sorting                         'alphabetic-asc
-          treemacs-select-when-already-in-treemacs 'move-back
-          treemacs-space-between-root-nodes        t
-          treemacs-tag-follow-cleanup              t
-          treemacs-tag-follow-delay                1.5
-          treemacs-text-scale                      nil
-          treemacs-user-mode-line-format           nil
-          treemacs-user-header-line-format         nil
-          treemacs-wide-toggle-width               70
-          treemacs-width                           35
-          treemacs-width-increment                 1
-          treemacs-width-is-initially-locked       t
-          treemacs-workspace-switch-cleanup        nil)
+  (use-package treemacs
+    :straight t
+    :config
+    (progn
+      (setq treemacs-buffer-name-function            #'treemacs-default-buffer-name
+            treemacs-buffer-name-prefix              " *Treemacs-Buffer-"
+            treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+            treemacs-deferred-git-apply-delay        0.5
+            treemacs-directory-name-transformer      #'identity
+            treemacs-display-in-side-window          t
+            treemacs-eldoc-display                   'simple
+            treemacs-file-event-delay                2000
+            treemacs-file-extension-regex            treemacs-last-period-regex-value
+            treemacs-file-follow-delay               0.2
+            treemacs-file-name-transformer           #'identity
+            treemacs-follow-after-init               t
+            treemacs-expand-after-init               t
+            treemacs-find-workspace-method           'find-for-file-or-pick-first
+            treemacs-git-command-pipe                ""
+            treemacs-goto-tag-strategy               'refetch-index
+            treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+            treemacs-hide-dot-git-directory          t
+            treemacs-hide-dot-jj-directory           t
+            treemacs-indentation                     2
+            treemacs-indentation-string              " "
+            treemacs-is-never-other-window           nil
+            treemacs-max-git-entries                 5000
+            treemacs-missing-project-action          'ask
+            treemacs-move-files-by-mouse-dragging    t
+            treemacs-move-forward-on-expand          nil
+            treemacs-no-png-images                   nil
+            treemacs-no-delete-other-windows         t
+            treemacs-project-follow-cleanup          nil
+            treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+            treemacs-position                        'left
+            treemacs-read-string-input               'from-child-frame
+            treemacs-recenter-distance               0.1
+            treemacs-recenter-after-file-follow      nil
+            treemacs-recenter-after-tag-follow       nil
+            treemacs-recenter-after-project-jump     'always
+            treemacs-recenter-after-project-expand   'on-distance
+            treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+            treemacs-project-follow-into-home        nil
+            treemacs-show-cursor                     nil
+            treemacs-show-hidden-files               t
+            treemacs-silent-filewatch                nil
+            treemacs-silent-refresh                  nil
+            treemacs-sorting                         'alphabetic-asc
+            treemacs-select-when-already-in-treemacs 'move-back
+            treemacs-space-between-root-nodes        t
+            treemacs-tag-follow-cleanup              t
+            treemacs-tag-follow-delay                1.5
+            treemacs-text-scale                      nil
+            treemacs-user-mode-line-format           nil
+            treemacs-user-header-line-format         nil
+            treemacs-wide-toggle-width               70
+            treemacs-width                           35
+            treemacs-width-increment                 1
+            treemacs-width-is-initially-locked       t
+            treemacs-workspace-switch-cleanup        nil)
 
-    ;; The default width and height of the icons is 22 pixels. If you are
-    ;; using a Hi-DPI display, uncomment this to double the icon size.
-    ;;(treemacs-resize-icons 44)
+      ;; The default width and height of the icons is 22 pixels. If you are
+      ;; using a Hi-DPI display, uncomment this to double the icon size.
+      ;;(treemacs-resize-icons 44)
 
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode 'always)
-    (when treemacs-python-executable
-      (treemacs-git-commit-diff-mode t))
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (treemacs-fringe-indicator-mode 'always)
+      (when treemacs-python-executable
+        (treemacs-git-commit-diff-mode t))
 
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null treemacs-python-executable)))
-      (`(t . t)
-       (treemacs-git-mode 'deferred))
-      (`(t . _)
-       (treemacs-git-mode 'simple)))
+      (pcase (cons (not (null (executable-find "git")))
+                   (not (null treemacs-python-executable)))
+        (`(t . t)
+         (treemacs-git-mode 'deferred))
+        (`(t . _)
+         (treemacs-git-mode 'simple)))
 
-    (treemacs-hide-gitignored-files-mode nil))
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("C-x t t"   . treemacs)
-        ("C-x t d"   . treemacs-select-directory)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
-
-(treemacs-start-on-boot)
+      (treemacs-hide-gitignored-files-mode nil)
+      (treemacs-start-on-boot))
+    :bind
+    (:map global-map
+          ("M-0"       . treemacs-select-window)
+          ("C-x t 1"   . treemacs-delete-other-windows)
+          ("C-x t t"   . treemacs)
+          ("C-x t d"   . treemacs-select-directory)
+          ("C-x t B"   . treemacs-bookmark)
+          ("C-x t C-t" . treemacs-find-file)
+          ("C-x t M-t" . treemacs-find-tag)))
 
 #+end_src
 
@@ -821,8 +813,7 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
 
   (use-package treemacs-projectile
   :straight t
-  :after (treemacs projectile)
-  :ensure t)
+  :after (treemacs projectile))
 
 #+end_src
 
@@ -834,8 +825,7 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
 #+begin_src emacs-lisp
 (use-package treemacs-icons-dired
   :straight t
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
+  :hook (dired-mode . treemacs-icons-dired-enable-once))
 
 #+end_src
 
@@ -924,7 +914,7 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
 #+begin_src emacs-lisp
 
   (defun pl/lsp-mode-setup ()
-    (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
     (lsp-headerline-breadcrumb-mode))
 
 
@@ -933,7 +923,7 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
     :custom
     (lsp-completion-provider :none) ;; we use Corfu!
     :init
-    (setq lsp-keymap-prefix "C-c l")
+    (setq lsp-keymap-prefix "C-c C-l")
 
     (defun my/lsp-mode-setup-completion ()
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
@@ -1112,113 +1102,113 @@ TODO: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
     :hook (org-mode . pl/org-mode-setup)
     :custom
     
-    ((org-agenda-start-with-log-mode t)
-     (org-ellipsis " ▾")                  
-     (org-agenda-files
-      '("~/org-agenda/Tasks.org"
-        "~/org-agenda/Habits.org"))
-     
-     (org-log-done 'time)                
-     (org-log-into-drawer t)
-     (org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "|"  "DONE(!d)")
-        (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)"
-  		"REVIEW(v)" "WAIT(w@/!" "HOLD(h)" "|"
-  		"COMPLETED(c)" "CANC(k@)")))
+    (org-agenda-start-with-log-mode t)
+    (org-ellipsis " ▾")                  
+    (org-agenda-files
+     '("~/org-agenda/Tasks.org"
+       "~/org-agenda/Habits.org"))
+    
+    (org-log-done 'time)                
+    (org-log-into-drawer t)
+    (org-todo-keywords
+     '((sequence "TODO(t)" "NEXT(n)" "|"  "DONE(!d)")
+       (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)"
+  	       "REVIEW(v)" "WAIT(w@/!" "HOLD(h)" "|"
+  	       "COMPLETED(c)" "CANC(k@)")))
 
-     (org-tag-alist
-      '((:startgroup)
-         (:endgroup)
-         ("@errand" . ?E)
-         ("@home" . ?H)
-         ("@work" . ?W)
-         ("agenda" . ?a)
-         ("planning" . ?p)
-         ("publish" . ?P)
-         ("batch" . ?b)
-         ("note" . ?n)
-         ("idea" . ?i)))
+    (org-tag-alist
+     '((:startgroup)
+       (:endgroup)
+       ("@errand" . ?E)
+       ("@home" . ?H)
+       ("@work" . ?W)
+       ("agenda" . ?a)
+       ("planning" . ?p)
+       ("publish" . ?P)
+       ("batch" . ?b)
+       ("note" . ?n)
+       ("idea" . ?i)))
 
-     (org-refile-targets
-      '(("~/Org-Agenda/Archive.org" :maxlevel . 1)))
+    (org-refile-targets
+     '(("~/Org-Agenda/Archive.org" :maxlevel . 1)))
 
-     (org-agenda-custom-commands
-      '(("d" "Dashboard"
-         ((agenda "" ((org-deadline-warning-days 7)))
-  	(todo "NEXT"
-                ((org-agenda-overriding-header "Next Tasks")))
-  	(tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header
+    (org-agenda-custom-commands
+     '(("d" "Dashboard"
+        ((agenda "" ((org-deadline-warning-days 7)))
+         (todo "NEXT"
+  	     ((org-agenda-overriding-header "Next Tasks")))
+         (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header
   				     "Active Projects")))))
 
-        ("n" "Next Tasks"
-         ((todo "NEXT"
-                ((org-agenda-overriding-header "Next Tasks")))))
+       ("n" "Next Tasks"
+        ((todo "NEXT"
+  	     ((org-agenda-overriding-header "Next Tasks")))))
 
-        ("W" "Work Tasks" tags-todo "+work-email")
+       ("W" "Work Tasks" tags-todo "+work-email")
 
-        ;; Low-effort next actions
-        ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
-         ((org-agenda-overriding-header "Low Effort Tasks")
-  	(org-agenda-max-todos 20)
-  	(org-agenda-files org-agenda-files)))
+       ;; Low-effort next actions
+       ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+        ((org-agenda-overriding-header "Low Effort Tasks")
+         (org-agenda-max-todos 20)
+         (org-agenda-files org-agenda-files)))
 
-        ("w" "Workflow Status"
-         ((todo "WAIT"
-                ((org-agenda-overriding-header "Waiting on External")
-                 (org-agenda-files org-agenda-files)))
-  	(todo "REVIEW"
-                ((org-agenda-overriding-header "In Review")
-                 (org-agenda-files org-agenda-files)))
-  	(todo "PLAN"
-                ((org-agenda-overriding-header "In Planning")
-                 (org-agenda-todo-list-sublevels nil)
-                 (org-agenda-files org-agenda-files)))
-  	(todo "BACKLOG"
-                ((org-agenda-overriding-header "Project Backlog")
-                 (org-agenda-todo-list-sublevels nil)
-                 (org-agenda-files org-agenda-files)))
-  	(todo "READY"
-                ((org-agenda-overriding-header "Ready for Work")
-                 (org-agenda-files org-agenda-files)))
-  	(todo "ACTIVE"
-                ((org-agenda-overriding-header "Active Projects")
-                 (org-agenda-files org-agenda-files)))
-  	(todo "COMPLETED"
-                ((org-agenda-overriding-header "Completed Projects")
-                 (org-agenda-files org-agenda-files)))
-  	(todo "CANC"
-                ((org-agenda-overriding-header "Cancelled Projects")
-                 (org-agenda-files org-agenda-files)))))))
+       ("w" "Workflow Status"
+        ((todo "WAIT"
+  	     ((org-agenda-overriding-header "Waiting on External")
+  	      (org-agenda-files org-agenda-files)))
+         (todo "REVIEW"
+  	     ((org-agenda-overriding-header "In Review")
+  	      (org-agenda-files org-agenda-files)))
+         (todo "PLAN"
+  	     ((org-agenda-overriding-header "In Planning")
+  	      (org-agenda-todo-list-sublevels nil)
+  	      (org-agenda-files org-agenda-files)))
+         (todo "BACKLOG"
+  	     ((org-agenda-overriding-header "Project Backlog")
+  	      (org-agenda-todo-list-sublevels nil)
+  	      (org-agenda-files org-agenda-files)))
+         (todo "READY"
+  	     ((org-agenda-overriding-header "Ready for Work")
+  	      (org-agenda-files org-agenda-files)))
+         (todo "ACTIVE"
+  	     ((org-agenda-overriding-header "Active Projects")
+  	      (org-agenda-files org-agenda-files)))
+         (todo "COMPLETED"
+  	     ((org-agenda-overriding-header "Completed Projects")
+  	      (org-agenda-files org-agenda-files)))
+         (todo "CANC"
+  	     ((org-agenda-overriding-header "Cancelled Projects")
+  	      (org-agenda-files org-agenda-files)))))))
 
-     (org-capture-templates
-  	 `(("t" "Tasks / Projects")
-  	   ("tt" "Task" entry (file+olp "~/Org-Agenda/Tasks.org" "Inbox")
-              "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+    (org-capture-templates
+     `(("t" "Tasks / Projects")
+       ("tt" "Task" entry (file+olp "~/Org-Agenda/Tasks.org" "Inbox")
+        "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
-  	   ("j" "Journal Entries")
-  	   ("jj" "Journal" entry
-              (file+olp+datetree "~/Org-Agenda/Journal.org")
-              "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-              :clock-in :clock-resume
-              :empty-lines 1)
-  	   ("jm" "Meeting" entry
-              (file+olp+datetree "~/Org-Agenda/Journal.org")
-              "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-              :clock-in :clock-resume
-              :empty-lines 1)
+       ("j" "Journal Entries")
+       ("jj" "Journal" entry
+        (file+olp+datetree "~/Org-Agenda/Journal.org")
+        "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+        :clock-in :clock-resume
+        :empty-lines 1)
+       ("jm" "Meeting" entry
+        (file+olp+datetree "~/Org-Agenda/Journal.org")
+        "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+        :clock-in :clock-resume
+        :empty-lines 1)
 
-  	   ("w" "Workflows")
-  	   ("we" "Checking Email" entry
-  	    (file+olp+datetree "~/Org-Agenda/Journal.org")
-  	    "* Checking Email :email:\n\n%?"
-  	    :clock-in :clock-resume :empty-lines 1)
+       ("w" "Workflows")
+       ("we" "Checking Email" entry
+        (file+olp+datetree "~/Org-Agenda/Journal.org")
+        "* Checking Email :email:\n\n%?"
+        :clock-in :clock-resume :empty-lines 1)
 
-  	   ("m" "Metrics Capture")
-  	   ("mw" "Weight" table-line
-  	    (file+headline "~/Org-Agenda/Metrics.org" "Weight")
-  	    "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
-
-     (setq org-habit-graph-column 60))
+       ("m" "Metrics Capture")
+       ("mw" "Weight" table-line
+        (file+headline "~/Org-Agenda/Metrics.org" "Weight")
+        "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+    
+    (org-habit-graph-column 60)
     
     :config
 
@@ -1250,7 +1240,12 @@ TODO: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
     (add-to-list 'org-babel-tangle-lang-exts '("rustic" . "rs"))
 
     ;; Optional: Alias the execute function to use rustic's implementation
-    (defalias 'org-babel-execute:rust #'org-babel-execute:rustic))
+    (defalias 'org-babel-execute:rust #'org-babel-execute:rustic)
+
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (python . t))))
 
 #+end_src
 
@@ -1325,12 +1320,7 @@ TODO: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
   ;; reachable from anywhere
   (global-set-key (kbd "C-c l") #'org-store-link)
   (global-set-key (kbd "C-c a") #'org-agenda)
-  (global-set-key (kbd "C-c c") #'org-capture)
-
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (python . t)))
+  (global-set-key (kbd "C-c C") #'org-capture)
 
 #+end_src
 
