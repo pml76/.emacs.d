@@ -624,7 +624,7 @@
 
 
 (defun pl/lsp-mode-setup ()
-  (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
 
 
@@ -633,7 +633,7 @@
   :custom
   (lsp-completion-provider :none) ;; we use Corfu!
   :init
-  (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-keymap-prefix "C-c C-l")
 
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
@@ -649,48 +649,40 @@
 
 
 
-(cond
-   ((eq system-type 'gnu/linux)
-    ;; nix-mode ------------------------------------------------------------
+(use-package dap-mode
+  :straight t
+  :config
 
-    (use-package dap-mode
-      :straight t
-      :config
-
-      (require 'dap-gdb)
-      (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
-      ;;
-      ;; (dap-register-debug-template
-      ;;  "GDB::Run"
-      ;;  (list :type "gdb"
-      ;;        :request "launch"
-      ;;        :name "GDB::Run"
-      ;;        :target nil
-      ;; 	 :program "/home/peter/tmp/a.out"
-      ;;        :cwd "/home/peter/tmp/"
-      ;; 	 ))
-      
-      (require 'dap-lldb)
-      (setq dap-lldb-debug-program '("lldb-dap"))
-      ;; (dap-register-debug-template
-      ;;  "LLDB::Run"
-      ;;  (list :type "lldb-vscode"
-      ;;        :cwd "/home/peter/tmp/"
-      ;;        :request "launch"
-      ;;        :program "/home/peter/tmp/a.out"
-      ;;        :name "LLDB::Run"))
-      
-      )
-    ))
-
-
-(cond
- ((eq system-type 'gnu/linux)
-  ;; nix-mode ------------------------------------------------------------
+  (require 'dap-gdb)
+  (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
+  ;;
+  ;; (dap-register-debug-template
+  ;;  "GDB::Run"
+  ;;  (list :type "gdb"
+  ;;        :request "launch"
+  ;;        :name "GDB::Run"
+  ;;        :target nil
+  ;; 	 :program "/home/peter/tmp/a.out"
+  ;;        :cwd "/home/peter/tmp/"
+  ;; 	 ))
   
-  (use-package nix-mode
-    :straight t
-    :mode "\\.nix\\'")))
+  (require 'dap-lldb)
+  (setq dap-lldb-debug-program '("lldb-dap"))
+  ;; (dap-register-debug-template
+  ;;  "LLDB::Run"
+  ;;  (list :type "lldb-vscode"
+  ;;        :cwd "/home/peter/tmp/"
+  ;;        :request "launch"
+  ;;        :program "/home/peter/tmp/a.out"
+  ;;        :name "LLDB::Run"))
+  
+  )
+
+
+
+(use-package nix-mode
+  :straight t
+  :mode "\\.nix\\'")
 
 
 
