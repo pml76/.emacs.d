@@ -926,35 +926,43 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
 
 #+begin_src emacs-lisp
 
-  (use-package dap-mode
-    :straight t
-    :config
+    (use-package dap-mode
+      :straight t
+      :config
 
-    (require 'dap-gdb)
-    (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
-    ;;
-    ;; (dap-register-debug-template
-    ;;  "GDB::Run"
-    ;;  (list :type "gdb"
-    ;;        :request "launch"
-    ;;        :name "GDB::Run"
-    ;;        :target nil
-    ;; 	 :program "/home/peter/tmp/a.out"
-    ;;        :cwd "/home/peter/tmp/"
-    ;; 	 ))
-    
-    (require 'dap-lldb)
-    (setq dap-lldb-debug-program '("lldb-dap"))
-    ;; (dap-register-debug-template
-    ;;  "LLDB::Run"
-    ;;  (list :type "lldb-vscode"
-    ;;        :cwd "/home/peter/tmp/"
-    ;;        :request "launch"
-    ;;        :program "/home/peter/tmp/a.out"
-    ;;        :name "LLDB::Run"))
-    
-    )
-  
+      (require 'dap-gdb)
+      (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
+      ;;
+      ;; (dap-register-debug-template
+      ;;  "GDB::Run"
+      ;;  (list :type "gdb"
+      ;;        :request "launch"
+      ;;        :name "GDB::Run"
+      ;;        :target nil
+      ;; 	 :program "/home/peter/tmp/a.out"
+      ;;        :cwd "/home/peter/tmp/"
+      ;; 	 ))
+      
+      (require 'dap-lldb)
+      (setq dap-lldb-debug-program '("lldb-dap"))
+      ;; (dap-register-debug-template
+      ;;  "LLDB::Run"
+      ;;  (list :type "lldb-vscode"
+      ;;        :cwd "/home/peter/tmp/"
+      ;;        :request "launch"
+      ;;        :program "/home/peter/tmp/a.out"
+      ;;        :name "LLDB::Run"))
+
+      :bind (:map dap-mode-map
+  		("<f5>"    . dap-continue)
+  		("<f6>"    . dap-hydra)
+  		("<f9>"    . dap-breakpoint-toggle)
+  		("<f10>"   . dap-next)
+  		("<f11>"   . dap-step-in)
+  		("S-<f11>" . dap-step-out)
+  		("C-<f5>"  . dap-debug)
+  		("C-<f9>"  . dap-breakpoint-condition)))
+
 #+end_src
 
 
@@ -1074,7 +1082,8 @@ TODO: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
     :after consult
     :hook (org-mode . pl/org-mode-setup)
     :custom
-    
+
+    (org-support-shift-select t)
     (org-agenda-start-with-log-mode t)
     (org-ellipsis " ▾")                  
     (org-agenda-files

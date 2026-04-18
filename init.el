@@ -679,8 +679,16 @@
   ;;        :request "launch"
   ;;        :program "/home/peter/tmp/a.out"
   ;;        :name "LLDB::Run"))
-  
-  )
+
+  :bind (:map dap-mode-map
+		("<f5>"    . dap-continue)
+		("<f6>"    . dap-hydra)
+		("<f9>"    . dap-breakpoint-toggle)
+		("<f10>"   . dap-next)
+		("<f11>"   . dap-step-in)
+		("S-<f11>" . dap-step-out)
+		("C-<f5>"  . dap-debug)
+		("C-<f9>"  . dap-breakpoint-condition)))
 
 
 
@@ -757,7 +765,8 @@
   :after consult
   :hook (org-mode . pl/org-mode-setup)
   :custom
-  
+
+  (org-support-shift-select t)
   (org-agenda-start-with-log-mode t)
   (org-ellipsis " ▾")                  
   (org-agenda-files
