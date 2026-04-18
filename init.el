@@ -1081,3 +1081,50 @@
   :config
   (save-place-mode 1))
 
+
+
+;; --- LaTeX (AUCTeX + cdlatex + LSP) ---
+
+(use-package auctex
+  :straight t
+  :defer t
+  :custom
+  ;; Use PDF by default instead of DVI
+  (TeX-PDF-mode t)
+  ;; Parse on load/save to keep style info up-to-date
+  (TeX-parse-self t)
+  (TeX-auto-save t)
+  ;; Ask for master file only once
+  (TeX-master nil)
+  ;; Use latexmk for compilation (handles bibtex/biber automatically)
+  (TeX-command-default "LatexMk")
+  ;; Forward/inverse search with pdf-tools (already installed)
+  (TeX-source-correlate-mode t)
+  (TeX-source-correlate-start-server t)
+  :config
+  ;; Use pdf-tools as the PDF viewer (you already have it)
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+  (setq TeX-view-program-list
+        '(("PDF Tools" TeX-pdf-tools-sync-view)))
+  ;; Revert PDF after compilation
+  (add-hook 'TeX-after-compilation-finished-functions
+            #'TeX-revert-document-buffer))
+
+
+(use-package cdlatex
+  :straight t
+  :hook
+  ((LaTeX-mode . cdlatex-mode)
+   (org-mode   . org-cdlatex-mode)))  ; also enhances org math input
+
+
+(use-package lsp-latex
+  :straight t
+  :after lsp-mode
+  :hook
+  ((LaTeX-mode . lsp)
+   (bibtex-mode . lsp))
+  :custom
+  ;; texlab is the LSP server — install via NixOS (see change.el notes)
+  (lsp-latex-texlab-executable "texlab"))
+  

@@ -55,6 +55,11 @@
       hunspellDicts.de_DE             # German
       pkgconf
 
+      # latex
+      texlab
+      texlive.combined.scheme-full
+
+
       # used by emacs for cmake development
       cmake-language-server
 
