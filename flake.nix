@@ -48,6 +48,10 @@
       # used by emacs for nix development
       nixd
 
+      # used by the emacs package 'jinx', the spell checker
+      enchant
+      hunspell
+
       # used by emacs for cmake development
       cmake-language-server
 
