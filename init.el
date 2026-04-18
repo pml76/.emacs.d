@@ -560,7 +560,8 @@
       (`(t . _)
        (treemacs-git-mode 'simple)))
 
-    (treemacs-hide-gitignored-files-mode nil))
+    (treemacs-hide-gitignored-files-mode nil)
+    (treemacs-start-on-boot))
   :bind
   (:map global-map
         ("M-0"       . treemacs-select-window)
