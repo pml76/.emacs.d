@@ -482,6 +482,11 @@
 
 (use-package treemacs
   :straight t
+  
+  ;; to ensure treemacs loads on startup rather than on
+  ;; keybinding activation.
+  :hook (emacs-startup . treemacs)
+
   :config
   (progn
     (setq treemacs-buffer-name-function            #'treemacs-default-buffer-name
@@ -568,8 +573,6 @@
         ("C-x t B"   . treemacs-bookmark)
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
-
- (treemacs-start-on-boot)
 
 
 

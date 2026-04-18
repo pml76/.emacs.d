@@ -688,6 +688,11 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
 #+begin_src emacs-lisp
   (use-package treemacs
     :straight t
+    
+    ;; to ensure treemacs loads on startup rather than on
+    ;; keybinding activation.
+    :hook (emacs-startup . treemacs)
+
     :config
     (progn
       (setq treemacs-buffer-name-function            #'treemacs-default-buffer-name
@@ -774,8 +779,6 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
           ("C-x t B"   . treemacs-bookmark)
           ("C-x t C-t" . treemacs-find-file)
           ("C-x t M-t" . treemacs-find-tag)))
-
-   (treemacs-start-on-boot)
 
 #+end_src
 
