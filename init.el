@@ -103,7 +103,7 @@
 
 (use-package doom-modeline
   :straight t
-  :after (all-the-icons nerd-icons)
+  :after all-the-icons nerd-icons
   :init (doom-modeline-mode 1))
 
 
@@ -111,8 +111,8 @@
 (use-package doom-themes
   :straight t
   :custom
-  (doom-themes-enable-bold t)    ; if nil, bold is universally disabled
-  (doom-themes-enable-italic t) ; if nil, italics are universally disabled
+  (doom-themes-enabe bold t)    ; if nil, bold is universally disabled
+  (doom-themes enable-italic t) ; if nil, italics are universally disabled
 
   ;; use "doom-atom" for less minimal icon theme
   (doom-themes-treemacs-theme "doom-atom")
@@ -146,8 +146,8 @@
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-;; (add-hook 'c-mode-hook                #'enable-paredit-mode)
-(add-hook 'rustic-mode-hook           #'enable-paredit-mode)
+(add-hook 'c-mode                     #'enable-paredit-mode)
+(add-hook 'rustic-mode                #'enable-paredit-mode)
 
 
 
@@ -168,7 +168,9 @@
   :bind
   ("C-h f" . helpful-callable)
   ("C-h v" . helpful-variable)
+  ([remap describe-function] . counsel-describe-function)
   ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
 
@@ -267,7 +269,7 @@
   :straight t
   ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
   ;; Press C-c p ? to for help.
-  :bind ("C-c C-p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
+  :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
   ;; Alternatively bind Cape commands individually.
   ;; :bind (("C-c p d" . cape-dabbrev)
   ;;        ("C-c p h" . cape-history)
@@ -303,6 +305,7 @@
 
 ;; A few more useful configurations...
 (use-package emacs
+  :straight t
   :custom
   ;; Enable context menu. `vertico-multiform-mode´ adds a menu in the minibuf
   ;; to switch display modes.
@@ -326,7 +329,12 @@
   
   ;; Emacs 30 and newer: Disable Ispell completion function.
   ;; Try `cape-dict' as an alternative.
-  (text-mode-ispell-word-completion nil))
+  (text-mode-ispell-word-completion nil)
+  
+  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
+  ;; commands are hidden, since they are not used via M-x. This setting is
+  ;; useful beyond Corfu.
+  (read-extended-command-predicate #'command-completion-default-include-p))
 
 
 
@@ -433,7 +441,6 @@
 
 
 (use-package consult-lsp
-  :straight t
   :after (consult lsp-mode)
   :bind (:map lsp-mode-map
               ("C-c l s s" . consult-lsp-symbols)
@@ -558,8 +565,7 @@
       (`(t . _)
        (treemacs-git-mode 'simple)))
 
-    (treemacs-hide-gitignored-files-mode nil)
-    (treemacs-start-on-boot))
+    (treemacs-hide-gitignored-files-mode nil))
   :bind
   (:map global-map
         ("M-0"       . treemacs-select-window)
@@ -570,16 +576,20 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
+(treemacs-start-on-boot)
+
 
 
 (use-package treemacs-projectile
 :straight t
-:after (treemacs projectile))
+:after (treemacs projectile)
+:ensure t)
 
 
 (use-package treemacs-icons-dired
   :straight t
-  :hook (dired-mode . treemacs-icons-dired-enable-once))
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
 
 
 (use-package treemacs-magit
@@ -624,7 +634,7 @@
 
 
 (defun pl/lsp-mode-setup ()
-  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
 
 
@@ -633,7 +643,7 @@
   :custom
   (lsp-completion-provider :none) ;; we use Corfu!
   :init
-  (setq lsp-keymap-prefix "C-c C-l")
+  (setq lsp-keymap-prefix "C-c l")
 
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
@@ -649,40 +659,48 @@
 
 
 
-(use-package dap-mode
-  :straight t
-  :config
+(cond
+   ((eq system-type 'gnu/linux)
+    ;; nix-mode ------------------------------------------------------------
 
-  (require 'dap-gdb)
-  (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
-  ;;
-  ;; (dap-register-debug-template
-  ;;  "GDB::Run"
-  ;;  (list :type "gdb"
-  ;;        :request "launch"
-  ;;        :name "GDB::Run"
-  ;;        :target nil
-  ;; 	 :program "/home/peter/tmp/a.out"
-  ;;        :cwd "/home/peter/tmp/"
-  ;; 	 ))
+    (use-package dap-mode
+      :straight t
+      :config
+
+      (require 'dap-gdb)
+      (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
+      ;;
+      ;; (dap-register-debug-template
+      ;;  "GDB::Run"
+      ;;  (list :type "gdb"
+      ;;        :request "launch"
+      ;;        :name "GDB::Run"
+      ;;        :target nil
+      ;; 	 :program "/home/peter/tmp/a.out"
+      ;;        :cwd "/home/peter/tmp/"
+      ;; 	 ))
+      
+      (require 'dap-lldb)
+      (setq dap-lldb-debug-program '("lldb-dap"))
+      ;; (dap-register-debug-template
+      ;;  "LLDB::Run"
+      ;;  (list :type "lldb-vscode"
+      ;;        :cwd "/home/peter/tmp/"
+      ;;        :request "launch"
+      ;;        :program "/home/peter/tmp/a.out"
+      ;;        :name "LLDB::Run"))
+      
+      )
+    ))
+
+
+(cond
+ ((eq system-type 'gnu/linux)
+  ;; nix-mode ------------------------------------------------------------
   
-  (require 'dap-lldb)
-  (setq dap-lldb-debug-program '("lldb-dap"))
-  ;; (dap-register-debug-template
-  ;;  "LLDB::Run"
-  ;;  (list :type "lldb-vscode"
-  ;;        :cwd "/home/peter/tmp/"
-  ;;        :request "launch"
-  ;;        :program "/home/peter/tmp/a.out"
-  ;;        :name "LLDB::Run"))
-  
-  )
-
-
-
-(use-package nix-mode
-  :straight t
-  :mode "\\.nix\\'")
+  (use-package nix-mode
+    :straight t
+    :mode "\\.nix\\'")))
 
 
 
