@@ -51,6 +51,8 @@
       # used by the emacs package 'jinx', the spell checker
       enchant
       hunspell
+      hunspellDicts.en_US-large       # or en_US for a smaller wordlist
+      hunspellDicts.de_DE             # German
 
       # used by emacs for cmake development
       cmake-language-server

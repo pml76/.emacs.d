@@ -1450,3 +1450,46 @@ Notable features include a command interface with convenient bindings (e.g. C-c 
 
      (claude-code-mode))
 #+end_src
+
+
+* The jinx spell checker
+
+[[][Jinx]] is Daniel Mendler's fast, just-in-time spell checker that uses Enchant, and it already knows how to restrict itself to comments and docstrings inside prog-mode buffers — so you mostly just need to turn it on in the right places.
+
+A few notes on how this behaves for your stack:
+
+Org-mode gets full prose checking (headings, paragraphs, list items). Jinx automatically skips source blocks, #+ keywords, links, and verbatim/code spans, so it won't squawk at your #+BEGIN_SRC blocks.
+For python-mode, rust-mode / rust-ts-mode, c-mode / c-ts-mode, and c++-mode / c++-ts-mode, the prog-mode hook is enough — Jinx walks the buffer's font-lock faces and only checks text fontified as font-lock-comment-face or font-lock-doc-face. If you'd rather not spell-check regular string literals (e.g., in Python), drop font-lock-string-face from jinx-include-faces.
+
+If you want an even simpler setup, replace the three hooks with (global-jinx-mode 1) in :config — Jinx is careful about which modes it activates in.
+
+One prerequisite: Jinx links against the Enchant C library, so on first install Emacs will compile its module. You'll want libenchant and at least one backend dictionary (e.g., Hunspell or Aspell with en_US) available on your system. On Debian/Ubuntu: sudo apt install libenchant-2-2 libenchant-2-dev hunspell hunspell-en-us. On macOS with Homebrew: brew install enchant.
+To add another language later, M-x jinx-languages lets you toggle dictionaries per-buffer, and saving a word via jinx-correct (M-$) persists it to your personal dictionary.
+
+#+begin_src emacs-lisp
+
+  ;; --- Jinx ---
+  (use-package jinx
+    :straight t
+    :hook ((org-mode  . jinx-mode)
+           (text-mode . jinx-mode)
+           (prog-mode . jinx-mode))   ; comments/strings only in code
+    :bind (("M-$"   . jinx-correct)
+           ("C-M-$" . jinx-languages))
+    :custom
+    (jinx-languages "en_US")
+    :config
+    (setq jinx-include-faces
+          '((prog-mode font-lock-comment-face
+                       font-lock-doc-face
+                       font-lock-string-face)
+            (conf-mode font-lock-comment-face)))
+
+    (setq jinx-exclude-regexps
+          '((t "[A-Z]+\\>"
+               "\\<[[:upper:]][[:lower:]]+[[:upper:]]\\w*\\>"
+               "\\w*[0-9]\\w*"
+               "[a-z]+_[a-z_]+"
+               "https?://\\S-+"))))
+
+#+end_src
