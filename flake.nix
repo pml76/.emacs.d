@@ -54,7 +54,6 @@
       hunspellDicts.en_US-large       # or en_US for a smaller wordlist
       hunspellDicts.de_DE             # German
       pkgconf
-      pkg-config
 
       # used by emacs for cmake development
       cmake-language-server
