@@ -971,30 +971,33 @@
 
 
 
-   ;; install required inheritenv dependency:
- (use-package inheritenv
-   :straight (:type git :host github :repo "purcell/inheritenv"))
+  ;; install required inheritenv dependency:
+(use-package inheritenv
+  :straight (:type git :host github :repo "purcell/inheritenv"))
 
- ;; for eat terminal backend:
- (use-package eat
-   :straight (:type git
-                    :host codeberg
-                    :repo "akib/emacs-eat"
-                    :files ("*.el" ("term" "term/*.el") "*.texi"
-                            "*.ti" ("terminfo/e" "terminfo/e/*")
-                            ("terminfo/65" "terminfo/65/*")
-                            ("integration" "integration/*")
-                            (:exclude ".dir-locals.el" "*-tests.el"))))
 
- ;; for vterm terminal backend:
- (use-package vterm :straight t)
+
+;; form eat terminal backend:
+(use-package eat
+  :straight (:type git
+                   :host codeberg
+                   :repo "akib/emacs-eat"
+                   :files ("*.el" ("term" "term/*.el") "*.texi"
+                           "*.ti" ("terminfo/e" "terminfo/e/*")
+                           ("terminfo/65" "terminfo/65/*")
+                           ("integration" "integration/*")
+			   (:exclude ".dir-locals.el" "*-tests.el"))))
+
+;; for vterm terminal backend:
+(use-package vterm :straight t)
 
 
 (use-package monet :straight ( :type git
 			       :host github
 			       :repo "stevemolitor/monet"))
 
- ;; install claude-code.el, using :depth 1 to reduce download size:
+
+;; install claude-code.el, using :depth 1 to reduce download size:
  (use-package claude-code
    :straight (:type git
  		   :host github
@@ -1014,4 +1017,29 @@
    (monet-mode 1)
 
    (claude-code-mode))
+
+
+;; --- Jinx ---
+(use-package jinx
+  :straight t
+  :hook ((org-mode  . jinx-mode)
+         (text-mode . jinx-mode)
+         (prog-mode . jinx-mode))   ; comments/strings only in code
+  :bind (("M-$"   . jinx-correct)
+         ("C-M-$" . jinx-languages))
+  :custom
+  (jinx-languages "en_US")
+  :config
+  (setq jinx-include-faces
+        '((prog-mode font-lock-comment-face
+                     font-lock-doc-face
+                     font-lock-string-face)
+          (conf-mode font-lock-comment-face)))
+
+  (setq jinx-exclude-regexps
+        '((t "[A-Z]+\\>"
+             "\\<[[:upper:]][[:lower:]]+[[:upper:]]\\w*\\>"
+             "\\w*[0-9]\\w*"
+             "[a-z]+_[a-z_]+"
+             "https?://\\S-+"))))
 
