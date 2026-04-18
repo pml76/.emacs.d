@@ -103,7 +103,7 @@
 
 (use-package doom-modeline
   :straight t
-  :after all-the-icons nerd-icons
+  :after (all-the-icons nerd-icons)
   :init (doom-modeline-mode 1))
 
 
@@ -111,8 +111,8 @@
 (use-package doom-themes
   :straight t
   :custom
-  (doom-themes-enabe bold t)    ; if nil, bold is universally disabled
-  (doom-themes enable-italic t) ; if nil, italics are universally disabled
+  (doom-themes-enable-bold t)    ; if nil, bold is universally disabled
+  (doom-themes-enable-italic t) ; if nil, italics are universally disabled
 
   ;; use "doom-atom" for less minimal icon theme
   (doom-themes-treemacs-theme "doom-atom")
@@ -146,8 +146,8 @@
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-(add-hook 'c-mode                     #'enable-paredit-mode)
-(add-hook 'rustic-mode                #'enable-paredit-mode)
+;; (add-hook 'c-mode-hook                #'enable-paredit-mode)
+(add-hook 'rustic-mode-hook           #'enable-paredit-mode)
 
 
 
@@ -168,9 +168,7 @@
   :bind
   ("C-h f" . helpful-callable)
   ("C-h v" . helpful-variable)
-  ([remap describe-function] . counsel-describe-function)
   ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
 
@@ -269,7 +267,7 @@
   :straight t
   ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
   ;; Press C-c p ? to for help.
-  :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
+  :bind ("C-c C-p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
   ;; Alternatively bind Cape commands individually.
   ;; :bind (("C-c p d" . cape-dabbrev)
   ;;        ("C-c p h" . cape-history)
@@ -305,7 +303,6 @@
 
 ;; A few more useful configurations...
 (use-package emacs
-  :straight t
   :custom
   ;; Enable context menu. `vertico-multiform-mode´ adds a menu in the minibuf
   ;; to switch display modes.
@@ -329,12 +326,7 @@
   
   ;; Emacs 30 and newer: Disable Ispell completion function.
   ;; Try `cape-dict' as an alternative.
-  (text-mode-ispell-word-completion nil)
-  
-  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
-  ;; commands are hidden, since they are not used via M-x. This setting is
-  ;; useful beyond Corfu.
-  (read-extended-command-predicate #'command-completion-default-include-p))
+  (text-mode-ispell-word-completion nil))
 
 
 
@@ -441,6 +433,7 @@
 
 
 (use-package consult-lsp
+  :straight t
   :after (consult lsp-mode)
   :bind (:map lsp-mode-map
               ("C-c l s s" . consult-lsp-symbols)
@@ -565,7 +558,8 @@
       (`(t . _)
        (treemacs-git-mode 'simple)))
 
-    (treemacs-hide-gitignored-files-mode nil))
+    (treemacs-hide-gitignored-files-mode nil)
+    (treemacs-start-on-boot))
   :bind
   (:map global-map
         ("M-0"       . treemacs-select-window)
@@ -576,20 +570,16 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
-(treemacs-start-on-boot)
-
 
 
 (use-package treemacs-projectile
 :straight t
-:after (treemacs projectile)
-:ensure t)
+:after (treemacs projectile))
 
 
 (use-package treemacs-icons-dired
   :straight t
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
+  :hook (dired-mode . treemacs-icons-dired-enable-once))
 
 
 (use-package treemacs-magit
@@ -634,7 +624,7 @@
 
 
 (defun pl/lsp-mode-setup ()
-  (setq pl/lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
 
 
@@ -643,7 +633,7 @@
   :custom
   (lsp-completion-provider :none) ;; we use Corfu!
   :init
-  (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-keymap-prefix "C-c C-l")
 
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
@@ -659,48 +649,40 @@
 
 
 
-(cond
-   ((eq system-type 'gnu/linux)
-    ;; nix-mode ------------------------------------------------------------
+(use-package dap-mode
+  :straight t
+  :config
 
-    (use-package dap-mode
-      :straight t
-      :config
-
-      (require 'dap-gdb)
-      (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
-      ;;
-      ;; (dap-register-debug-template
-      ;;  "GDB::Run"
-      ;;  (list :type "gdb"
-      ;;        :request "launch"
-      ;;        :name "GDB::Run"
-      ;;        :target nil
-      ;; 	 :program "/home/peter/tmp/a.out"
-      ;;        :cwd "/home/peter/tmp/"
-      ;; 	 ))
-      
-      (require 'dap-lldb)
-      (setq dap-lldb-debug-program '("lldb-dap"))
-      ;; (dap-register-debug-template
-      ;;  "LLDB::Run"
-      ;;  (list :type "lldb-vscode"
-      ;;        :cwd "/home/peter/tmp/"
-      ;;        :request "launch"
-      ;;        :program "/home/peter/tmp/a.out"
-      ;;        :name "LLDB::Run"))
-      
-      )
-    ))
-
-
-(cond
- ((eq system-type 'gnu/linux)
-  ;; nix-mode ------------------------------------------------------------
+  (require 'dap-gdb)
+  (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
+  ;;
+  ;; (dap-register-debug-template
+  ;;  "GDB::Run"
+  ;;  (list :type "gdb"
+  ;;        :request "launch"
+  ;;        :name "GDB::Run"
+  ;;        :target nil
+  ;; 	 :program "/home/peter/tmp/a.out"
+  ;;        :cwd "/home/peter/tmp/"
+  ;; 	 ))
   
-  (use-package nix-mode
-    :straight t
-    :mode "\\.nix\\'")))
+  (require 'dap-lldb)
+  (setq dap-lldb-debug-program '("lldb-dap"))
+  ;; (dap-register-debug-template
+  ;;  "LLDB::Run"
+  ;;  (list :type "lldb-vscode"
+  ;;        :cwd "/home/peter/tmp/"
+  ;;        :request "launch"
+  ;;        :program "/home/peter/tmp/a.out"
+  ;;        :name "LLDB::Run"))
+  
+  )
+
+
+
+(use-package nix-mode
+  :straight t
+  :mode "\\.nix\\'")
 
 
 
@@ -772,113 +754,113 @@
   :hook (org-mode . pl/org-mode-setup)
   :custom
   
-  ((org-agenda-start-with-log-mode t)
-   (org-ellipsis " ▾")                  
-   (org-agenda-files
-    '("~/org-agenda/Tasks.org"
-      "~/org-agenda/Habits.org"))
-   
-   (org-log-done 'time)                
-   (org-log-into-drawer t)
-   (org-todo-keywords
-    '((sequence "TODO(t)" "NEXT(n)" "|"  "DONE(!d)")
-      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)"
-		"REVIEW(v)" "WAIT(w@/!" "HOLD(h)" "|"
-		"COMPLETED(c)" "CANC(k@)")))
+  (org-agenda-start-with-log-mode t)
+  (org-ellipsis " ▾")                  
+  (org-agenda-files
+   '("~/org-agenda/Tasks.org"
+     "~/org-agenda/Habits.org"))
+  
+  (org-log-done 'time)                
+  (org-log-into-drawer t)
+  (org-todo-keywords
+   '((sequence "TODO(t)" "NEXT(n)" "|"  "DONE(!d)")
+     (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)"
+	       "REVIEW(v)" "WAIT(w@/!" "HOLD(h)" "|"
+	       "COMPLETED(c)" "CANC(k@)")))
 
-   (org-tag-alist
-    '((:startgroup)
-       (:endgroup)
-       ("@errand" . ?E)
-       ("@home" . ?H)
-       ("@work" . ?W)
-       ("agenda" . ?a)
-       ("planning" . ?p)
-       ("publish" . ?P)
-       ("batch" . ?b)
-       ("note" . ?n)
-       ("idea" . ?i)))
+  (org-tag-alist
+   '((:startgroup)
+     (:endgroup)
+     ("@errand" . ?E)
+     ("@home" . ?H)
+     ("@work" . ?W)
+     ("agenda" . ?a)
+     ("planning" . ?p)
+     ("publish" . ?P)
+     ("batch" . ?b)
+     ("note" . ?n)
+     ("idea" . ?i)))
 
-   (org-refile-targets
-    '(("~/Org-Agenda/Archive.org" :maxlevel . 1)))
+  (org-refile-targets
+   '(("~/Org-Agenda/Archive.org" :maxlevel . 1)))
 
-   (org-agenda-custom-commands
-    '(("d" "Dashboard"
-       ((agenda "" ((org-deadline-warning-days 7)))
-	(todo "NEXT"
-              ((org-agenda-overriding-header "Next Tasks")))
-	(tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header
+  (org-agenda-custom-commands
+   '(("d" "Dashboard"
+      ((agenda "" ((org-deadline-warning-days 7)))
+       (todo "NEXT"
+	     ((org-agenda-overriding-header "Next Tasks")))
+       (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header
 				     "Active Projects")))))
 
-      ("n" "Next Tasks"
-       ((todo "NEXT"
-              ((org-agenda-overriding-header "Next Tasks")))))
+     ("n" "Next Tasks"
+      ((todo "NEXT"
+	     ((org-agenda-overriding-header "Next Tasks")))))
 
-      ("W" "Work Tasks" tags-todo "+work-email")
+     ("W" "Work Tasks" tags-todo "+work-email")
 
-      ;; Low-effort next actions
-      ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
-       ((org-agenda-overriding-header "Low Effort Tasks")
-	(org-agenda-max-todos 20)
-	(org-agenda-files org-agenda-files)))
+     ;; Low-effort next actions
+     ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+      ((org-agenda-overriding-header "Low Effort Tasks")
+       (org-agenda-max-todos 20)
+       (org-agenda-files org-agenda-files)))
 
-      ("w" "Workflow Status"
-       ((todo "WAIT"
-              ((org-agenda-overriding-header "Waiting on External")
-               (org-agenda-files org-agenda-files)))
-	(todo "REVIEW"
-              ((org-agenda-overriding-header "In Review")
-               (org-agenda-files org-agenda-files)))
-	(todo "PLAN"
-              ((org-agenda-overriding-header "In Planning")
-               (org-agenda-todo-list-sublevels nil)
-               (org-agenda-files org-agenda-files)))
-	(todo "BACKLOG"
-              ((org-agenda-overriding-header "Project Backlog")
-               (org-agenda-todo-list-sublevels nil)
-               (org-agenda-files org-agenda-files)))
-	(todo "READY"
-              ((org-agenda-overriding-header "Ready for Work")
-               (org-agenda-files org-agenda-files)))
-	(todo "ACTIVE"
-              ((org-agenda-overriding-header "Active Projects")
-               (org-agenda-files org-agenda-files)))
-	(todo "COMPLETED"
-              ((org-agenda-overriding-header "Completed Projects")
-               (org-agenda-files org-agenda-files)))
-	(todo "CANC"
-              ((org-agenda-overriding-header "Cancelled Projects")
-               (org-agenda-files org-agenda-files)))))))
+     ("w" "Workflow Status"
+      ((todo "WAIT"
+	     ((org-agenda-overriding-header "Waiting on External")
+	      (org-agenda-files org-agenda-files)))
+       (todo "REVIEW"
+	     ((org-agenda-overriding-header "In Review")
+	      (org-agenda-files org-agenda-files)))
+       (todo "PLAN"
+	     ((org-agenda-overriding-header "In Planning")
+	      (org-agenda-todo-list-sublevels nil)
+	      (org-agenda-files org-agenda-files)))
+       (todo "BACKLOG"
+	     ((org-agenda-overriding-header "Project Backlog")
+	      (org-agenda-todo-list-sublevels nil)
+	      (org-agenda-files org-agenda-files)))
+       (todo "READY"
+	     ((org-agenda-overriding-header "Ready for Work")
+	      (org-agenda-files org-agenda-files)))
+       (todo "ACTIVE"
+	     ((org-agenda-overriding-header "Active Projects")
+	      (org-agenda-files org-agenda-files)))
+       (todo "COMPLETED"
+	     ((org-agenda-overriding-header "Completed Projects")
+	      (org-agenda-files org-agenda-files)))
+       (todo "CANC"
+	     ((org-agenda-overriding-header "Cancelled Projects")
+	      (org-agenda-files org-agenda-files)))))))
 
-   (org-capture-templates
-	 `(("t" "Tasks / Projects")
-	   ("tt" "Task" entry (file+olp "~/Org-Agenda/Tasks.org" "Inbox")
-            "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+  (org-capture-templates
+   `(("t" "Tasks / Projects")
+     ("tt" "Task" entry (file+olp "~/Org-Agenda/Tasks.org" "Inbox")
+      "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
-	   ("j" "Journal Entries")
-	   ("jj" "Journal" entry
-            (file+olp+datetree "~/Org-Agenda/Journal.org")
-            "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-            :clock-in :clock-resume
-            :empty-lines 1)
-	   ("jm" "Meeting" entry
-            (file+olp+datetree "~/Org-Agenda/Journal.org")
-            "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-            :clock-in :clock-resume
-            :empty-lines 1)
+     ("j" "Journal Entries")
+     ("jj" "Journal" entry
+      (file+olp+datetree "~/Org-Agenda/Journal.org")
+      "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+      :clock-in :clock-resume
+      :empty-lines 1)
+     ("jm" "Meeting" entry
+      (file+olp+datetree "~/Org-Agenda/Journal.org")
+      "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+      :clock-in :clock-resume
+      :empty-lines 1)
 
-	   ("w" "Workflows")
-	   ("we" "Checking Email" entry
-	    (file+olp+datetree "~/Org-Agenda/Journal.org")
-	    "* Checking Email :email:\n\n%?"
-	    :clock-in :clock-resume :empty-lines 1)
+     ("w" "Workflows")
+     ("we" "Checking Email" entry
+      (file+olp+datetree "~/Org-Agenda/Journal.org")
+      "* Checking Email :email:\n\n%?"
+      :clock-in :clock-resume :empty-lines 1)
 
-	   ("m" "Metrics Capture")
-	   ("mw" "Weight" table-line
-	    (file+headline "~/Org-Agenda/Metrics.org" "Weight")
-	    "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
-
-   (setq org-habit-graph-column 60))
+     ("m" "Metrics Capture")
+     ("mw" "Weight" table-line
+      (file+headline "~/Org-Agenda/Metrics.org" "Weight")
+      "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+  
+  (org-habit-graph-column 60)
   
   :config
 
@@ -910,7 +892,12 @@
   (add-to-list 'org-babel-tangle-lang-exts '("rustic" . "rs"))
 
   ;; Optional: Alias the execute function to use rustic's implementation
-  (defalias 'org-babel-execute:rust #'org-babel-execute:rustic))
+  (defalias 'org-babel-execute:rust #'org-babel-execute:rustic)
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t))))
 
 
 
@@ -918,12 +905,25 @@
   :straight t)
 
 
-(use-package org-bullets
+
+(use-package org-modern
   :straight t
   :after org
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq org-modern-block-fringe nil
+	org-modern-star 'replace))
+
+
+
+(use-package org-appear
+  :straight t
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autosubmarkers t
+        org-appear-autoentities t
+        org-appear-autolinks t
+        org-appear-inside-latex t))
 
 
 (defun pl/org-mode-visual-fill ()
@@ -941,12 +941,7 @@
 ;; reachable from anywhere
 (global-set-key (kbd "C-c l") #'org-store-link)
 (global-set-key (kbd "C-c a") #'org-agenda)
-(global-set-key (kbd "C-c c") #'org-capture)
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)))
+(global-set-key (kbd "C-c C") #'org-capture)
 
 
 
@@ -974,4 +969,78 @@
   :after rust-mode
   :config
   (require 'rustic-babel))
+
+
+
+  ;; install required inheritenv dependency:
+(use-package inheritenv
+  :straight (:type git :host github :repo "purcell/inheritenv"))
+
+
+
+;; form eat terminal backend:
+(use-package eat
+  :straight (:type git
+                   :host codeberg
+                   :repo "akib/emacs-eat"
+                   :files ("*.el" ("term" "term/*.el") "*.texi"
+                           "*.ti" ("terminfo/e" "terminfo/e/*")
+                           ("terminfo/65" "terminfo/65/*")
+                           ("integration" "integration/*")
+			   (:exclude ".dir-locals.el" "*-tests.el"))))
+
+;; for vterm terminal backend:
+(use-package vterm :straight t)
+
+
+(use-package monet :straight ( :type git
+			       :host github
+			       :repo "stevemolitor/monet"))
+
+
+;; install claude-code.el, using :depth 1 to reduce download size:
+ (use-package claude-code
+   :straight (:type git
+ 		   :host github
+ 		   :repo "stevemolitor/claude-code.el"
+ 		   :branch "main" :depth 1
+                    :files ("*.el" (:exclude "images/*")))
+   :bind-keymap
+   ("C-c c" . claude-code-command-map) ;; or your preferred key
+   ;; Optionally define a repeat map so that "M" will cycle thru Claude auto-accept/plan/confirm modes after invoking claude-code-cycle-mode / C-c M.
+   :bind
+   (:repeat-map my-claude-code-map ("M" . claude-code-cycle-mode))
+   :custom (claude-code-terminal-backend #'vterm)
+   :config
+   ;; optional IDE integration with Monet
+   (add-hook 'claude-code-process-environment-functions
+	     #'monet-start-server-function)
+   (monet-mode 1)
+
+   (claude-code-mode))
+
+
+;; --- Jinx ---
+(use-package jinx
+  :straight t
+  :hook ((org-mode  . jinx-mode)
+         (text-mode . jinx-mode)
+         (prog-mode . jinx-mode))   ; comments/strings only in code
+  :bind (("M-$"   . jinx-correct)
+         ("C-M-$" . jinx-languages))
+  :custom
+  (jinx-languages "en_US")
+  :config
+  (setq jinx-include-faces
+        '((prog-mode font-lock-comment-face
+                     font-lock-doc-face
+                     font-lock-string-face)
+          (conf-mode font-lock-comment-face)))
+
+  (setq jinx-exclude-regexps
+        '((t "[A-Z]+\\>"
+             "\\<[[:upper:]][[:lower:]]+[[:upper:]]\\w*\\>"
+             "\\w*[0-9]\\w*"
+             "[a-z]+_[a-z_]+"
+             "https?://\\S-+"))))
 
