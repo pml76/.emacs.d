@@ -910,7 +910,7 @@
   :after org
   :hook (org-mode . org-modern-mode)
   :config
-  (setq org-modern-block-fringe t
+  (setq org-modern-block-fringe nil
 	org-modern-star 'replace))
 
 
@@ -940,12 +940,7 @@
 ;; reachable from anywhere
 (global-set-key (kbd "C-c l") #'org-store-link)
 (global-set-key (kbd "C-c a") #'org-agenda)
-(global-set-key (kbd "C-c c") #'org-capture)
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)))
+(global-set-key (kbd "C-c C") #'org-capture)
 
 
 
