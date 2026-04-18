@@ -1048,3 +1048,36 @@
              "[a-z]+_[a-z_]+"
              "https?://\\S-+"))))
 
+
+(use-package pdf-tools
+  :straight t
+  :magic ("%PDF" . pdf-view-mode)
+  :config
+  (pdf-tools-install :no-query)
+  (setq-default pdf-view-display-size 'fit-page)
+  (setq pdf-view-resize-factor 1.1
+        pdf-view-use-unicode-ligatures t
+        pdf-annot-activate-created-annotations t)
+
+  ;; Match doom-one dark theme
+  (setq pdf-view-midnight-colors
+        '("#bbc2cf" . "#282c34"))  ; doom-one fg/bg
+
+  :hook
+  (pdf-view-mode . pdf-view-midnight-minor-mode)
+  (pdf-view-mode . pdf-view-auto-slice-minor-mode)
+
+  :bind (:map pdf-view-mode-map
+              ("j"   . pdf-view-next-line-or-next-page)
+              ("k"   . pdf-view-previous-line-or-previous-page)
+              ("M-g g" . pdf-view-goto-page)
+              ("C-s" . isearch-forward)))
+
+
+;; Remember last-viewed page across sessions
+(use-package saveplace-pdf-view
+  :straight t
+  :after pdf-tools
+  :config
+  (save-place-mode 1))
+

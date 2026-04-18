@@ -2,10 +2,12 @@
 
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
+https://github.com/larstvei/dot-emacs
+
 
 * straight.el Setup
 
-[[https://github.com/radian-software/straight.el][straight.el]] is a next-generation package manager for Emacs that replaces the built-in package.el. Instead of downloading pre-built tarballs, it installs packages by cloning their Git repositories directly, giving you precise control over versions. This makes your Emacs configuration fully reproducible — you can lock packages to exact commits and share a consistent setup across machines. It also makes local package development easy, since you're just editing the live Git checkout. It integrates well with use-package as a drop-in alternative to :ensure.
+[[https://github.com/radian-software/straight.el][straight.el]] is a next-generation package manager for Emacs that replaces the built-in package.el. Instead of downloading prebuilt tarballs, it installs packages by cloning their Git repositories directly, giving you precise control over versions. This makes your Emacs configuration fully reproducible — you can lock packages to exact commits and share a consistent setup across machines. It also makes local package development easy, since you're just editing the live Git checkout. It integrates well with use-package as a drop-in alternative to :ensure.
 
  The following code snippet downloads and installs straight.el. In case this does not work one can clone the straight.el repo from github into ~/.emacs.d/straight/repos.
 
@@ -1488,4 +1490,42 @@ To add another language later, M-x jinx-languages lets you toggle dictionaries p
                "[a-z]+_[a-z_]+"
                "https?://\\S-+"))))
 
+#+end_src
+
+
+* pdf-mode
+
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :straight t
+    :magic ("%PDF" . pdf-view-mode)
+    :config
+    (pdf-tools-install :no-query)
+    (setq-default pdf-view-display-size 'fit-page)
+    (setq pdf-view-resize-factor 1.1
+          pdf-view-use-unicode-ligatures t
+          pdf-annot-activate-created-annotations t)
+
+    ;; Match doom-one dark theme
+    (setq pdf-view-midnight-colors
+          '("#bbc2cf" . "#282c34"))  ; doom-one fg/bg
+
+    :hook
+    (pdf-view-mode . pdf-view-midnight-minor-mode)
+    (pdf-view-mode . pdf-view-auto-slice-minor-mode)
+
+    :bind (:map pdf-view-mode-map
+                ("j"   . pdf-view-next-line-or-next-page)
+                ("k"   . pdf-view-previous-line-or-previous-page)
+                ("M-g g" . pdf-view-goto-page)
+                ("C-s" . isearch-forward)))
+
+
+  ;; Remember last-viewed page across sessions
+  (use-package saveplace-pdf-view
+    :straight t
+    :after pdf-tools
+    :config
+    (save-place-mode 1))
+  
 #+end_src
