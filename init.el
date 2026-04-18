@@ -753,113 +753,113 @@
   :hook (org-mode . pl/org-mode-setup)
   :custom
   
-  ((org-agenda-start-with-log-mode t)
-   (org-ellipsis " ▾")                  
-   (org-agenda-files
-    '("~/org-agenda/Tasks.org"
-      "~/org-agenda/Habits.org"))
-   
-   (org-log-done 'time)                
-   (org-log-into-drawer t)
-   (org-todo-keywords
-    '((sequence "TODO(t)" "NEXT(n)" "|"  "DONE(!d)")
-      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)"
-		"REVIEW(v)" "WAIT(w@/!" "HOLD(h)" "|"
-		"COMPLETED(c)" "CANC(k@)")))
+  (org-agenda-start-with-log-mode t)
+  (org-ellipsis " ▾")                  
+  (org-agenda-files
+   '("~/org-agenda/Tasks.org"
+     "~/org-agenda/Habits.org"))
+  
+  (org-log-done 'time)                
+  (org-log-into-drawer t)
+  (org-todo-keywords
+   '((sequence "TODO(t)" "NEXT(n)" "|"  "DONE(!d)")
+     (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)"
+	       "REVIEW(v)" "WAIT(w@/!" "HOLD(h)" "|"
+	       "COMPLETED(c)" "CANC(k@)")))
 
-   (org-tag-alist
-    '((:startgroup)
-       (:endgroup)
-       ("@errand" . ?E)
-       ("@home" . ?H)
-       ("@work" . ?W)
-       ("agenda" . ?a)
-       ("planning" . ?p)
-       ("publish" . ?P)
-       ("batch" . ?b)
-       ("note" . ?n)
-       ("idea" . ?i)))
+  (org-tag-alist
+   '((:startgroup)
+     (:endgroup)
+     ("@errand" . ?E)
+     ("@home" . ?H)
+     ("@work" . ?W)
+     ("agenda" . ?a)
+     ("planning" . ?p)
+     ("publish" . ?P)
+     ("batch" . ?b)
+     ("note" . ?n)
+     ("idea" . ?i)))
 
-   (org-refile-targets
-    '(("~/Org-Agenda/Archive.org" :maxlevel . 1)))
+  (org-refile-targets
+   '(("~/Org-Agenda/Archive.org" :maxlevel . 1)))
 
-   (org-agenda-custom-commands
-    '(("d" "Dashboard"
-       ((agenda "" ((org-deadline-warning-days 7)))
-	(todo "NEXT"
-              ((org-agenda-overriding-header "Next Tasks")))
-	(tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header
+  (org-agenda-custom-commands
+   '(("d" "Dashboard"
+      ((agenda "" ((org-deadline-warning-days 7)))
+       (todo "NEXT"
+	     ((org-agenda-overriding-header "Next Tasks")))
+       (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header
 				     "Active Projects")))))
 
-      ("n" "Next Tasks"
-       ((todo "NEXT"
-              ((org-agenda-overriding-header "Next Tasks")))))
+     ("n" "Next Tasks"
+      ((todo "NEXT"
+	     ((org-agenda-overriding-header "Next Tasks")))))
 
-      ("W" "Work Tasks" tags-todo "+work-email")
+     ("W" "Work Tasks" tags-todo "+work-email")
 
-      ;; Low-effort next actions
-      ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
-       ((org-agenda-overriding-header "Low Effort Tasks")
-	(org-agenda-max-todos 20)
-	(org-agenda-files org-agenda-files)))
+     ;; Low-effort next actions
+     ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+      ((org-agenda-overriding-header "Low Effort Tasks")
+       (org-agenda-max-todos 20)
+       (org-agenda-files org-agenda-files)))
 
-      ("w" "Workflow Status"
-       ((todo "WAIT"
-              ((org-agenda-overriding-header "Waiting on External")
-               (org-agenda-files org-agenda-files)))
-	(todo "REVIEW"
-              ((org-agenda-overriding-header "In Review")
-               (org-agenda-files org-agenda-files)))
-	(todo "PLAN"
-              ((org-agenda-overriding-header "In Planning")
-               (org-agenda-todo-list-sublevels nil)
-               (org-agenda-files org-agenda-files)))
-	(todo "BACKLOG"
-              ((org-agenda-overriding-header "Project Backlog")
-               (org-agenda-todo-list-sublevels nil)
-               (org-agenda-files org-agenda-files)))
-	(todo "READY"
-              ((org-agenda-overriding-header "Ready for Work")
-               (org-agenda-files org-agenda-files)))
-	(todo "ACTIVE"
-              ((org-agenda-overriding-header "Active Projects")
-               (org-agenda-files org-agenda-files)))
-	(todo "COMPLETED"
-              ((org-agenda-overriding-header "Completed Projects")
-               (org-agenda-files org-agenda-files)))
-	(todo "CANC"
-              ((org-agenda-overriding-header "Cancelled Projects")
-               (org-agenda-files org-agenda-files)))))))
+     ("w" "Workflow Status"
+      ((todo "WAIT"
+	     ((org-agenda-overriding-header "Waiting on External")
+	      (org-agenda-files org-agenda-files)))
+       (todo "REVIEW"
+	     ((org-agenda-overriding-header "In Review")
+	      (org-agenda-files org-agenda-files)))
+       (todo "PLAN"
+	     ((org-agenda-overriding-header "In Planning")
+	      (org-agenda-todo-list-sublevels nil)
+	      (org-agenda-files org-agenda-files)))
+       (todo "BACKLOG"
+	     ((org-agenda-overriding-header "Project Backlog")
+	      (org-agenda-todo-list-sublevels nil)
+	      (org-agenda-files org-agenda-files)))
+       (todo "READY"
+	     ((org-agenda-overriding-header "Ready for Work")
+	      (org-agenda-files org-agenda-files)))
+       (todo "ACTIVE"
+	     ((org-agenda-overriding-header "Active Projects")
+	      (org-agenda-files org-agenda-files)))
+       (todo "COMPLETED"
+	     ((org-agenda-overriding-header "Completed Projects")
+	      (org-agenda-files org-agenda-files)))
+       (todo "CANC"
+	     ((org-agenda-overriding-header "Cancelled Projects")
+	      (org-agenda-files org-agenda-files)))))))
 
-   (org-capture-templates
-	 `(("t" "Tasks / Projects")
-	   ("tt" "Task" entry (file+olp "~/Org-Agenda/Tasks.org" "Inbox")
-            "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+  (org-capture-templates
+   `(("t" "Tasks / Projects")
+     ("tt" "Task" entry (file+olp "~/Org-Agenda/Tasks.org" "Inbox")
+      "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
-	   ("j" "Journal Entries")
-	   ("jj" "Journal" entry
-            (file+olp+datetree "~/Org-Agenda/Journal.org")
-            "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-            :clock-in :clock-resume
-            :empty-lines 1)
-	   ("jm" "Meeting" entry
-            (file+olp+datetree "~/Org-Agenda/Journal.org")
-            "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-            :clock-in :clock-resume
-            :empty-lines 1)
+     ("j" "Journal Entries")
+     ("jj" "Journal" entry
+      (file+olp+datetree "~/Org-Agenda/Journal.org")
+      "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+      :clock-in :clock-resume
+      :empty-lines 1)
+     ("jm" "Meeting" entry
+      (file+olp+datetree "~/Org-Agenda/Journal.org")
+      "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+      :clock-in :clock-resume
+      :empty-lines 1)
 
-	   ("w" "Workflows")
-	   ("we" "Checking Email" entry
-	    (file+olp+datetree "~/Org-Agenda/Journal.org")
-	    "* Checking Email :email:\n\n%?"
-	    :clock-in :clock-resume :empty-lines 1)
+     ("w" "Workflows")
+     ("we" "Checking Email" entry
+      (file+olp+datetree "~/Org-Agenda/Journal.org")
+      "* Checking Email :email:\n\n%?"
+      :clock-in :clock-resume :empty-lines 1)
 
-	   ("m" "Metrics Capture")
-	   ("mw" "Weight" table-line
-	    (file+headline "~/Org-Agenda/Metrics.org" "Weight")
-	    "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
-
-   (setq org-habit-graph-column 60))
+     ("m" "Metrics Capture")
+     ("mw" "Weight" table-line
+      (file+headline "~/Org-Agenda/Metrics.org" "Weight")
+      "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+  
+  (org-habit-graph-column 60)
   
   :config
 
@@ -891,7 +891,12 @@
   (add-to-list 'org-babel-tangle-lang-exts '("rustic" . "rs"))
 
   ;; Optional: Alias the execute function to use rustic's implementation
-  (defalias 'org-babel-execute:rust #'org-babel-execute:rustic))
+  (defalias 'org-babel-execute:rust #'org-babel-execute:rustic)
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t))))
 
 
 
