@@ -764,8 +764,7 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
         (`(t . _)
          (treemacs-git-mode 'simple)))
 
-      (treemacs-hide-gitignored-files-mode nil)
-      (treemacs-start-on-boot))
+      (treemacs-hide-gitignored-files-mode nil))
     :bind
     (:map global-map
           ("M-0"       . treemacs-select-window)
@@ -775,6 +774,8 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
           ("C-x t B"   . treemacs-bookmark)
           ("C-x t C-t" . treemacs-find-file)
           ("C-x t M-t" . treemacs-find-tag)))
+
+   (treemacs-start-on-boot)
 
 #+end_src
 

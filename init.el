@@ -1,6 +1,4 @@
 
-
-
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name
@@ -570,6 +568,8 @@
         ("C-x t B"   . treemacs-bookmark)
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
+
+ (treemacs-start-on-boot)
 
 
 
