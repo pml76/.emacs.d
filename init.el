@@ -267,7 +267,7 @@
   :straight t
   ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
   ;; Press C-c p ? to for help.
-  :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
+  :bind ("C-c C-p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
   ;; Alternatively bind Cape commands individually.
   ;; :bind (("C-c p d" . cape-dabbrev)
   ;;        ("C-c p h" . cape-history)
@@ -303,7 +303,6 @@
 
 ;; A few more useful configurations...
 (use-package emacs
-  :straight t
   :custom
   ;; Enable context menu. `vertico-multiform-mode´ adds a menu in the minibuf
   ;; to switch display modes.
@@ -327,12 +326,7 @@
   
   ;; Emacs 30 and newer: Disable Ispell completion function.
   ;; Try `cape-dict' as an alternative.
-  (text-mode-ispell-word-completion nil)
-  
-  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
-  ;; commands are hidden, since they are not used via M-x. This setting is
-  ;; useful beyond Corfu.
-  (read-extended-command-predicate #'command-completion-default-include-p))
+  (text-mode-ispell-word-completion nil))
 
 
 
@@ -439,6 +433,7 @@
 
 
 (use-package consult-lsp
+  :straight t
   :after (consult lsp-mode)
   :bind (:map lsp-mode-map
               ("C-c l s s" . consult-lsp-symbols)
@@ -574,20 +569,16 @@
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
-(treemacs-start-on-boot)
-
 
 
 (use-package treemacs-projectile
 :straight t
-:after (treemacs projectile)
-:ensure t)
+:after (treemacs projectile))
 
 
 (use-package treemacs-icons-dired
   :straight t
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
+  :hook (dired-mode . treemacs-icons-dired-enable-once))
 
 
 (use-package treemacs-magit
