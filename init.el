@@ -103,7 +103,7 @@
 
 (use-package doom-modeline
   :straight t
-  :after all-the-icons nerd-icons
+  :after (all-the-icons nerd-icons)
   :init (doom-modeline-mode 1))
 
 
@@ -111,8 +111,8 @@
 (use-package doom-themes
   :straight t
   :custom
-  (doom-themes-enabe bold t)    ; if nil, bold is universally disabled
-  (doom-themes enable-italic t) ; if nil, italics are universally disabled
+  (doom-themes-enable-bold t)    ; if nil, bold is universally disabled
+  (doom-themes-enable-italic t) ; if nil, italics are universally disabled
 
   ;; use "doom-atom" for less minimal icon theme
   (doom-themes-treemacs-theme "doom-atom")
@@ -146,8 +146,8 @@
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-(add-hook 'c-mode                     #'enable-paredit-mode)
-(add-hook 'rustic-mode                #'enable-paredit-mode)
+;; (add-hook 'c-mode-hook                #'enable-paredit-mode)
+(add-hook 'rustic-mode-hook           #'enable-paredit-mode)
 
 
 
@@ -168,9 +168,7 @@
   :bind
   ("C-h f" . helpful-callable)
   ("C-h v" . helpful-variable)
-  ([remap describe-function] . counsel-describe-function)
   ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
 
@@ -269,7 +267,7 @@
   :straight t
   ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
   ;; Press C-c p ? to for help.
-  :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
+  :bind ("C-c C-p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
   ;; Alternatively bind Cape commands individually.
   ;; :bind (("C-c p d" . cape-dabbrev)
   ;;        ("C-c p h" . cape-history)
@@ -305,7 +303,6 @@
 
 ;; A few more useful configurations...
 (use-package emacs
-  :straight t
   :custom
   ;; Enable context menu. `vertico-multiform-mode´ adds a menu in the minibuf
   ;; to switch display modes.
