@@ -649,48 +649,40 @@
 
 
 
-(cond
-   ((eq system-type 'gnu/linux)
-    ;; nix-mode ------------------------------------------------------------
+(use-package dap-mode
+  :straight t
+  :config
 
-    (use-package dap-mode
-      :straight t
-      :config
-
-      (require 'dap-gdb)
-      (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
-      ;;
-      ;; (dap-register-debug-template
-      ;;  "GDB::Run"
-      ;;  (list :type "gdb"
-      ;;        :request "launch"
-      ;;        :name "GDB::Run"
-      ;;        :target nil
-      ;; 	 :program "/home/peter/tmp/a.out"
-      ;;        :cwd "/home/peter/tmp/"
-      ;; 	 ))
-      
-      (require 'dap-lldb)
-      (setq dap-lldb-debug-program '("lldb-dap"))
-      ;; (dap-register-debug-template
-      ;;  "LLDB::Run"
-      ;;  (list :type "lldb-vscode"
-      ;;        :cwd "/home/peter/tmp/"
-      ;;        :request "launch"
-      ;;        :program "/home/peter/tmp/a.out"
-      ;;        :name "LLDB::Run"))
-      
-      )
-    ))
-
-
-(cond
- ((eq system-type 'gnu/linux)
-  ;; nix-mode ------------------------------------------------------------
+  (require 'dap-gdb)
+  (setq dap-gdb-debug-program '("gdb" "-i" "dap"))
+  ;;
+  ;; (dap-register-debug-template
+  ;;  "GDB::Run"
+  ;;  (list :type "gdb"
+  ;;        :request "launch"
+  ;;        :name "GDB::Run"
+  ;;        :target nil
+  ;; 	 :program "/home/peter/tmp/a.out"
+  ;;        :cwd "/home/peter/tmp/"
+  ;; 	 ))
   
-  (use-package nix-mode
-    :straight t
-    :mode "\\.nix\\'")))
+  (require 'dap-lldb)
+  (setq dap-lldb-debug-program '("lldb-dap"))
+  ;; (dap-register-debug-template
+  ;;  "LLDB::Run"
+  ;;  (list :type "lldb-vscode"
+  ;;        :cwd "/home/peter/tmp/"
+  ;;        :request "launch"
+  ;;        :program "/home/peter/tmp/a.out"
+  ;;        :name "LLDB::Run"))
+  
+  )
+
+
+
+(use-package nix-mode
+  :straight t
+  :mode "\\.nix\\'")
 
 
 
@@ -919,7 +911,7 @@
   :after org
   :hook (org-mode . org-modern-mode)
   :config
-  (setq org-modern-block-fringe t
+  (setq org-modern-block-fringe nil
 	org-modern-star 'replace))
 
 
@@ -980,30 +972,33 @@
 
 
 
-   ;; install required inheritenv dependency:
- (use-package inheritenv
-   :straight (:type git :host github :repo "purcell/inheritenv"))
+  ;; install required inheritenv dependency:
+(use-package inheritenv
+  :straight (:type git :host github :repo "purcell/inheritenv"))
 
- ;; for eat terminal backend:
- (use-package eat
-   :straight (:type git
-                    :host codeberg
-                    :repo "akib/emacs-eat"
-                    :files ("*.el" ("term" "term/*.el") "*.texi"
-                            "*.ti" ("terminfo/e" "terminfo/e/*")
-                            ("terminfo/65" "terminfo/65/*")
-                            ("integration" "integration/*")
-                            (:exclude ".dir-locals.el" "*-tests.el"))))
 
- ;; for vterm terminal backend:
- (use-package vterm :straight t)
+
+;; form eat terminal backend:
+(use-package eat
+  :straight (:type git
+                   :host codeberg
+                   :repo "akib/emacs-eat"
+                   :files ("*.el" ("term" "term/*.el") "*.texi"
+                           "*.ti" ("terminfo/e" "terminfo/e/*")
+                           ("terminfo/65" "terminfo/65/*")
+                           ("integration" "integration/*")
+			   (:exclude ".dir-locals.el" "*-tests.el"))))
+
+;; for vterm terminal backend:
+(use-package vterm :straight t)
 
 
 (use-package monet :straight ( :type git
 			       :host github
 			       :repo "stevemolitor/monet"))
 
- ;; install claude-code.el, using :depth 1 to reduce download size:
+
+;; install claude-code.el, using :depth 1 to reduce download size:
  (use-package claude-code
    :straight (:type git
  		   :host github
@@ -1023,4 +1018,29 @@
    (monet-mode 1)
 
    (claude-code-mode))
+
+
+;; --- Jinx ---
+(use-package jinx
+  :straight t
+  :hook ((org-mode  . jinx-mode)
+         (text-mode . jinx-mode)
+         (prog-mode . jinx-mode))   ; comments/strings only in code
+  :bind (("M-$"   . jinx-correct)
+         ("C-M-$" . jinx-languages))
+  :custom
+  (jinx-languages "en_US")
+  :config
+  (setq jinx-include-faces
+        '((prog-mode font-lock-comment-face
+                     font-lock-doc-face
+                     font-lock-string-face)
+          (conf-mode font-lock-comment-face)))
+
+  (setq jinx-exclude-regexps
+        '((t "[A-Z]+\\>"
+             "\\<[[:upper:]][[:lower:]]+[[:upper:]]\\w*\\>"
+             "\\w*[0-9]\\w*"
+             "[a-z]+_[a-z_]+"
+             "https?://\\S-+"))))
 
