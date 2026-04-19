@@ -661,6 +661,7 @@
   :straight t
   :custom
   (lsp-completion-provider :none) ;; we use Corfu!
+  (lsp-inlay-hint-enable t)
   :init
   (setq lsp-keymap-prefix "C-c C-l")
 
@@ -669,6 +670,7 @@
           '(flex))) ;; Configure flex  
   :hook
   ((lsp-mode . pl/lsp-mode-setup)
+   (lsp-mode . lsp-inlay-hints-mode)
    (lsp-completion-mode . my/lsp-mode-setup-completion)
    (c++-mode . lsp)
    (c-mode . lsp)
