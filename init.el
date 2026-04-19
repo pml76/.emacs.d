@@ -643,15 +643,6 @@
 
 
 
-;; envrc must load early so that lsp-mode and compilation buffers
-;; inherit the correct PATH/environment from each project's .envrc
-;; (critical on NixOS where rust-analyzer, clangd etc. live in the flake)
-(use-package envrc
-  :straight t
-  :config (envrc-global-mode))
-
-
-
 (defun pl/lsp-mode-setup ()
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
@@ -669,7 +660,6 @@
           '(flex))) ;; Configure flex  
   :hook
   ((lsp-mode . pl/lsp-mode-setup)
-   (lsp-mode . lsp-inlay-hint-mode)
    (lsp-completion-mode . my/lsp-mode-setup-completion)
    (c++-mode . lsp)
    (c-mode . lsp)
@@ -734,12 +724,7 @@
 (use-package flycheck
   :straight t
   :config
-  (add-hook 'after-init-hook #'global-flycheck-mode)
-  :hook
-  ;; rustic and lsp-mode use flymake; disable flycheck there to avoid
-  ;; two competing diagnostic UIs in the same buffer
-  ((rustic-mode . (lambda () (flycheck-mode -1)))
-   (lsp-mode    . (lambda () (flycheck-mode -1)))))
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 
 
 
@@ -747,28 +732,6 @@
   :straight t
   :hook
   ((cmake-mode . lsp)))
-
-
-
-(use-package clang-format
-  :straight t
-  :hook
-  ((c-mode   . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))
-   (c++-mode . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))))
-
-
-
-(use-package modern-cpp-font-lock
-  :straight t
-  :hook (c++-mode . modern-c++-font-lock-mode))
-
-
-
-;; Colored cargo / cmake / make output in *compilation* buffers
-(add-hook 'compilation-filter-hook #'ansi-color-compilation-filter)
-
-;; Toggle between .h/.cpp (or .h/.c) without leaving the keyboard
-(global-set-key (kbd "C-c o") #'ff-find-other-file)
 
 
   
@@ -1042,14 +1005,6 @@
   (require 'rustic-babel))
 
 
-
-
-(use-package cargo-transient
-  :straight t
-  :bind (:map rustic-mode-map ("C-c C-c" . cargo-transient)))
-
-
-
 ;; rust-analyzer settings, applied once lsp-rust is loaded
 (with-eval-after-load 'lsp-rust
   (setq
@@ -1068,17 +1023,6 @@
 
    ;; code lenses above fn/test/impl: "Run | Debug | NN references"
    lsp-rust-analyzer-lens-enable                t))
-
-
-
-(with-eval-after-load 'lsp-clangd
-  (setq lsp-clients-clangd-args
-        '("--background-index"           ; index entire project in background
-          "--clang-tidy"                 ; surface clang-tidy diagnostics via LSP
-          "--completion-style=detailed"  ; full signature info in completions
-          "--header-insertion=never"     ; don't auto-insert #includes
-          "--pch-storage=memory"         ; faster PCH (requires enough RAM)
-          "-j=4")))
 
 
 
