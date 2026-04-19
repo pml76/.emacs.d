@@ -136,6 +136,23 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 
+
+(use-package smartparens
+  :straight t
+  :hook (prog-mode . smartparens-mode)
+  :config
+  ;; loads language-specific pair definitions (Rust, Haskell, LaTeX, etc.)
+  (require 'smartpanens-config))
+
+  (dolist (mode '(emacs-lisp-mode
+		  lisp-mode
+		  scheme-mode
+		  ielm-mode
+		  lisp-interaction-mode))
+  (add-hook (intern (concat (symbol-name mode) "-hook"))
+            (lambda () (smartparens-mode -1))))
+
+
 (use-package paredit
   :straight t)
 
@@ -146,8 +163,7 @@
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-;; (add-hook 'c-mode-hook                #'enable-paredit-mode)
-(add-hook 'rustic-mode-hook           #'enable-paredit-mode)
+
 
 
 
@@ -959,7 +975,8 @@
 
 
 (use-package yasnippet
-  :straight t)
+  :straight t
+  :config (yas-global-mode 1))
 
 
 
@@ -978,10 +995,32 @@
 
 (use-package rustic
   :straight t
-  :after flymake
-  :after rust-mode
+  :after (flymake rust-mode)
+  :custom
+  (rustic-lsp-client 'lsp-mode)   ; explicit: use lsp-mode, not eglot
+  (rustic-format-on-save t)        ; run rustfmt on every save
   :config
   (require 'rustic-babel))
+
+
+;; rust-analyzer settings, applied once lsp-rust is loaded
+(with-eval-after-load 'lsp-rust
+  (setq
+   ;; use clippy instead of cargo check for richer diagnostics
+   lsp-rust-analyzer-cargo-watch-command        "clippy"
+
+   ;; inlay hints: show inferred types, parameter names, chained calls
+   lsp-rust-analyzer-display-inlay-hints        t
+   lsp-rust-analyzer-display-parameter-hints    t
+   lsp-rust-analyzer-display-chained-hint       t
+   lsp-rust-analyzer-closure-return-type-hints  "with_block"
+
+   ;; proc macros and build scripts: needed for crates like serde, tokio
+   lsp-rust-analyzer-proc-macro-enable                t
+   lsp-rust-analyzer-cargo-load-out-dirs-from-check   t
+
+   ;; code lenses above fn/test/impl: "Run | Debug | NN references"
+   lsp-rust-analyzer-lens-enable                t))
 
 
 
@@ -1137,3 +1176,60 @@
   ;; texlab is the LSP server — install via NixOS (see change.el notes)
   (lsp-latex-texlab-executable "texlab"))
   
+
+
+(use-package haskell-mode
+  :straight t
+  :hook
+  ((haskell-mode . interactive-haskell-mode)   ; GHCi REPL integration
+   (haskell-mode . haskell-indentation-mode)
+   (haskell-mode . flymake-mode))
+  :custom
+  (haskell-process-type 'auto)                  ; auto-detect cabal/stack/ghci
+  (haskell-interactive-popup-errors nil)        ; let flymake/lsp handle errors
+  (haskell-process-suggest-remove-import-lines t)
+  (haskell-process-auto-import-loaded-modules t))
+
+(use-package lsp-haskell
+  :straight t
+  :after lsp-mode
+  :hook (haskell-mode . lsp)
+  :custom
+  ;; haskell-language-server-wrapper picks the right HLS for the GHC version
+  (lsp-haskell-server-path "haskell-language-server-wrapper"))
+
+
+
+  ;; --- Coq (Proof General + company-coq) ---
+
+(use-package proof-general
+  :straight t
+  :custom
+  (proof-splash-enable nil)                  ; skip the PG splash screen
+  (proof-three-window-mode-policy 'hybrid)   ; goals left, response below goals
+  (proof-electric-terminator-enable t)       ; pressing . steps through proof
+  (coq-compile-before-require t)             ; auto-compile imported libraries
+  (coq-compile-parallel-in-background t)     ; don't block Emacs while compiling
+  :hook
+  (coq-mode . prettify-symbols-mode))        ; render ∀ ∃ → λ etc. as Unicode
+
+
+;; company is only here as a dependency for company-coq
+(use-package company
+  :straight t
+  :defer t)
+
+
+(use-package company-coq
+  :straight t
+  :after (proof-general company)
+  :custom
+  (company-coq-live-on-the-edge t)  ; enables extra features still in development
+  :hook
+  (coq-mode . company-coq-mode))
+
+
+;; company-coq drives completion in coq buffers via company;
+;; disable corfu there to avoid two competing completion UIs
+(add-hook 'coq-mode-hook (lambda () (corfu-mode -1)))
+

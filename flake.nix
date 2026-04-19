@@ -63,8 +63,13 @@
       # used by emacs for cmake development
       cmake-language-server
 
-      #claude code for testing ...
+      # claude code for testing ...
       claude-code.packages.${stdenv.hostPlatform.system}.claude-code
+
+      # haskell support
+      ghc
+      haskell-language-server
+      stack
       
       # fonts
       noto-fonts
