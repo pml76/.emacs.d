@@ -234,7 +234,7 @@ It relies on nerd-icons (or previously all-the-icons) for the icons, and is desi
     :hook (prog-mode . smartparens-mode)
     :config
     ;; loads language-specific pair definitions (Rust, Haskell, LaTeX, etc.)
-    (require 'smartpanens-config))
+    (require 'smartparens-config))
 
     (dolist (mode '(emacs-lisp-mode
   		  lisp-mode
@@ -1309,7 +1309,9 @@ TODO: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
 
   (use-package visual-fill-column
     :straight t
-    :hook (org-mode . pl/org-mode-visual-fill))
+    :hook
+    (org-mode . pl/org-mode-visual-fill)
+    (LaTeX-mode . pl/org-mode-visual-fill))
 
 #+end_src
 
@@ -1523,6 +1525,7 @@ To add another language later, M-x jinx-languages lets you toggle dictionaries p
     :straight t
     :hook ((org-mode  . jinx-mode)
            (text-mode . jinx-mode)
+  	 (LaTeX-mode . jinx-mode)
            (prog-mode . jinx-mode))   ; comments/strings only in code
     :bind (("M-$"   . jinx-correct)
            ("C-M-$" . jinx-languages))
@@ -1605,6 +1608,8 @@ To add another language later, M-x jinx-languages lets you toggle dictionaries p
     ;; Forward/inverse search with pdf-tools (already installed)
     (TeX-source-correlate-mode t)
     (TeX-source-correlate-start-server t)
+    :hook
+    (LaTeX-mode . TeX-fold-mode)
     :config
     ;; Use pdf-tools as the PDF viewer (you already have it)
     (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
@@ -1632,6 +1637,23 @@ To add another language later, M-x jinx-languages lets you toggle dictionaries p
     ;; texlab is the LSP server — install via NixOS (see change.el notes)
     (lsp-latex-texlab-executable "texlab"))
     
+#+end_src
+
+
+#+begin_src emacs-lisp
+
+  (use-package reftex
+    :straight t
+    :hook (LaTeX-mode . turn-on-reftex)
+    :custom
+    (reftex-plug-into-AUCTeX t))  ; integrates \ref/\cite with AUCTeX commands
+
+
+  ;; cape-tex completes \alpha, \beta etc. — appended so LSP (texlab) wins first
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (add-to-list 'completion-at-point-functions #'cape-tex t)))
+
 #+end_src
 
 

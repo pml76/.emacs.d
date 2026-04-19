@@ -142,7 +142,7 @@
   :hook (prog-mode . smartparens-mode)
   :config
   ;; loads language-specific pair definitions (Rust, Haskell, LaTeX, etc.)
-  (require 'smartpanens-config))
+  (require 'smartparens-config))
 
   (dolist (mode '(emacs-lisp-mode
 		  lisp-mode
@@ -962,7 +962,9 @@
 
 (use-package visual-fill-column
   :straight t
-  :hook (org-mode . pl/org-mode-visual-fill))
+  :hook
+  (org-mode . pl/org-mode-visual-fill)
+  (LaTeX-mode . pl/org-mode-visual-fill))
 
 
 
@@ -1077,6 +1079,7 @@
   :straight t
   :hook ((org-mode  . jinx-mode)
          (text-mode . jinx-mode)
+	 (LaTeX-mode . jinx-mode)
          (prog-mode . jinx-mode))   ; comments/strings only in code
   :bind (("M-$"   . jinx-correct)
          ("C-M-$" . jinx-languages))
@@ -1149,6 +1152,8 @@
   ;; Forward/inverse search with pdf-tools (already installed)
   (TeX-source-correlate-mode t)
   (TeX-source-correlate-start-server t)
+  :hook
+  (LaTeX-mode . TeX-fold-mode)
   :config
   ;; Use pdf-tools as the PDF viewer (you already have it)
   (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
@@ -1176,6 +1181,20 @@
   ;; texlab is the LSP server — install via NixOS (see change.el notes)
   (lsp-latex-texlab-executable "texlab"))
   
+
+
+(use-package reftex
+  :straight t
+  :hook (LaTeX-mode . turn-on-reftex)
+  :custom
+  (reftex-plug-into-AUCTeX t))  ; integrates \ref/\cite with AUCTeX commands
+
+
+;; cape-tex completes \alpha, \beta etc. — appended so LSP (texlab) wins first
+(add-hook 'LaTeX-mode-hook
+          (lambda ()
+            (add-to-list 'completion-at-point-functions #'cape-tex t)))
+
 
 
 (use-package haskell-mode
