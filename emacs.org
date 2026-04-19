@@ -949,7 +949,7 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
             '(flex))) ;; Configure flex  
     :hook
     ((lsp-mode . pl/lsp-mode-setup)
-     (lsp-mode . lsp-inlay-hint-mode)
+     (lsp-mode . lsp-inlay-hints-mode)
      (lsp-completion-mode . my/lsp-mode-setup-completion)
      (c++-mode . lsp)
      (c-mode . lsp)
