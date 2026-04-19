@@ -270,11 +270,8 @@
   ;; Capfs and Dabbrev can be used globally (M-/).  See also the customization
   ;; variable `global-corfu-modes' to exclude certain modes.
   (global-corfu-mode)
-
-  ;; Enable optional extension modes:
-  ;; (corfu-history-mode)
-  ;; (corfu-popupinfo-mode)
-  )
+  (corfu-history-mode)        ; persist completion history across sessions
+  (corfu-popupinfo-mode))     ; show documentation popup alongside candidates
 
 
 
@@ -621,12 +618,28 @@
 
 
 
+(use-package lsp-treemacs
+  :straight t
+  :after (lsp-mode treemacs)
+  :config (lsp-treemacs-sync-mode 1))
+
+
+
 (use-package magit
   :straight t
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
 (setenv "GIT_ASKPASS" "git-gui--askpass")
+
+
+
+(use-package diff-hl
+  :straight t
+  :hook ((prog-mode          . diff-hl-mode)
+         (dired-mode         . diff-hl-dired-mode)
+         (magit-pre-refresh  . diff-hl-magit-pre-refresh)
+         (magit-post-refresh . diff-hl-magit-post-refresh)))
 
 
 
@@ -672,8 +685,8 @@
   ((lsp-mode . pl/lsp-mode-setup)
    (lsp-mode . lsp-inlay-hints-mode)
    (lsp-completion-mode . my/lsp-mode-setup-completion)
-   (c++-mode . lsp)
-   (c-mode . lsp)
+   (c++-ts-mode . lsp)
+   (c-ts-mode . lsp)
    (nix-mode . lsp)
    (lsp-mode . lsp-enable-which-key-integration))
   :commands (lsp lsp-deferred))
@@ -721,13 +734,39 @@
 
 (use-package nix-mode
   :straight t
-  :mode "\\.nix\\'")
+  :mode "\\.nix\\'"
+  :hook
+  (nix-mode . (lambda ()
+                (add-hook 'before-save-hook #'nix-format-buffer nil t))))
+
+;; Register nixd as the LSP server for Nix.  nixd must be on PATH
+;; (add it to your NixOS packages or devShell).
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(nix-mode . "nix"))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("nixd"))
+    :major-modes '(nix-mode)
+    :server-id 'nixd)))
+
+
+
+(when (treesit-available-p)
+  (add-to-list 'major-mode-remap-alist '(c-mode   . c-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode)))
 
 
 
 (use-package lsp-ui
   :straight t
   :after lsp-mode
+  :custom
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-show-with-cursor nil)      ; only on explicit hover, not constantly
+  (lsp-ui-doc-show-with-mouse t)
+  (lsp-ui-sideline-show-diagnostics t)
+  (lsp-ui-sideline-show-hover nil)       ; too noisy with rust-analyzer
+  (lsp-ui-sideline-show-code-actions t)
   :commands lsp-ui-mode)
 
 
@@ -751,22 +790,38 @@
 
 
 
+(use-package cmake-font-lock
+  :straight t
+  :hook (cmake-mode . cmake-font-lock-activate))
+
+
+
 (use-package clang-format
   :straight t
   :hook
-  ((c-mode   . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))
-   (c++-mode . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))))
+  ((c-ts-mode   . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))
+   (c++-ts-mode . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))))
 
 
 
 (use-package modern-cpp-font-lock
   :straight t
-  :hook (c++-mode . modern-c++-font-lock-mode))
+  :hook (c++-ts-mode . modern-c++-font-lock-mode))
+
+
+
+(use-package disaster
+  :straight t
+  :bind (:map c++-ts-mode-map ("C-c d" . disaster)
+         :map c-ts-mode-map   ("C-c d" . disaster)))
 
 
 
 ;; Colored cargo / cmake / make output in *compilation* buffers
 (add-hook 'compilation-filter-hook #'ansi-color-compilation-filter)
+
+;; Scroll to the first error; stop auto-scrolling after that
+(setq compilation-scroll-output 'first-error)
 
 ;; Toggle between .h/.cpp (or .h/.c) without leaving the keyboard
 (global-set-key (kbd "C-c o") #'ff-find-other-file)
@@ -1068,7 +1123,17 @@
    lsp-rust-analyzer-cargo-load-out-dirs-from-check   t
 
    ;; code lenses above fn/test/impl: "Run | Debug | NN references"
-   lsp-rust-analyzer-lens-enable                t))
+   lsp-rust-analyzer-lens-enable                t
+
+   ;; search all symbols, not just exported ones
+   lsp-rust-analyzer-workspace-symbol-search-kind "all_symbols"
+
+   ;; check all targets (bins, tests, examples, benchmarks)
+   lsp-rust-analyzer-cargo-all-targets            t
+
+   ;; add call parentheses and argument snippets on completion
+   lsp-rust-analyzer-completion-add-call-parenthesis        t
+   lsp-rust-analyzer-completion-add-call-argument-snippets  t))
 
 
 

@@ -427,11 +427,8 @@ Better help sites for elisp function used by emacs.
     ;; Capfs and Dabbrev can be used globally (M-/).  See also the customization
     ;; variable `global-corfu-modes' to exclude certain modes.
     (global-corfu-mode)
-
-    ;; Enable optional extension modes:
-    ;; (corfu-history-mode)
-    ;; (corfu-popupinfo-mode)
-    )
+    (corfu-history-mode)        ; persist completion history across sessions
+    (corfu-popupinfo-mode))     ; show documentation popup alongside candidates
  
 #+end_src
 
@@ -862,6 +859,27 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
 #+end_src
 
 
+** lsp-treemacs
+
+[[https://github.com/emacs-lsp/lsp-treemacs][lsp-treemacs]] bridges lsp-mode and Treemacs, providing LSP-aware tree views that complement the file explorer. Key commands:
+
+- =lsp-treemacs-errors-list= — workspace-wide diagnostics panel, filterable by severity
+- =lsp-treemacs-symbols= — outline/symbol browser for the current file
+- =lsp-treemacs-call-hierarchy= — interactive call graph (who calls this? what does this call?)
+- =lsp-treemacs-type-hierarchy= — class/trait inheritance tree
+
+=lsp-treemacs-sync-mode= keeps the Treemacs file tree in sync with the LSP workspace roots.
+
+#+begin_src emacs-lisp
+
+  (use-package lsp-treemacs
+    :straight t
+    :after (lsp-mode treemacs)
+    :config (lsp-treemacs-sync-mode 1))
+
+#+end_src
+
+
 * Magit
 
 [[https://magit.vc/][Magit]] is a full-featured Git interface inside Emacs, often called one of Emacs' "killer apps." It lets you perform virtually all Git operations — staging (even individual hunks or partial hunks), committing, branching, merging, rebasing, cherry-picking, blaming, and more — through an intuitive, keyboard-driven interface. Under the hood it simply runs Git commands, so it's transparent and educational, but it makes even complex Git workflows far faster than the command line.
@@ -874,6 +892,22 @@ The package /emacs/ is not a real installable package — it's a pseudo-package 
     (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
   (setenv "GIT_ASKPASS" "git-gui--askpass")
+
+#+end_src
+
+
+* diff-hl
+
+[[https://github.com/dgutov/diff-hl][diff-hl]] highlights uncommitted changes (additions, modifications, deletions) in the fringe of programming buffers, giving a VS Code-style git diff gutter. Unlike git-gutter, it integrates directly with Magit — =diff-hl-magit-pre-refresh= and =diff-hl-magit-post-refresh= hooks ensure the fringe updates immediately after staging, unstaging, or committing, without any polling.
+
+#+begin_src emacs-lisp
+
+  (use-package diff-hl
+    :straight t
+    :hook ((prog-mode          . diff-hl-mode)
+           (dired-mode         . diff-hl-dired-mode)
+           (magit-pre-refresh  . diff-hl-magit-pre-refresh)
+           (magit-post-refresh . diff-hl-magit-post-refresh)))
 
 #+end_src
 
@@ -952,8 +986,8 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
     ((lsp-mode . pl/lsp-mode-setup)
      (lsp-mode . lsp-inlay-hints-mode)
      (lsp-completion-mode . my/lsp-mode-setup-completion)
-     (c++-mode . lsp)
-     (c-mode . lsp)
+     (c++-ts-mode . lsp)
+     (c-ts-mode . lsp)
      (nix-mode . lsp)
      (lsp-mode . lsp-enable-which-key-integration))
     :commands (lsp lsp-deferred))
@@ -1010,11 +1044,43 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
 
 [[https://github.com/NixOS/nix-mode][nix-mode]] is an Emacs major mode for editing Nix expressions (.nix files). It provides syntax highlighting, indentation, and basic integration with the Nix toolchain — including building projects, interacting with Nix flakes via a magit-style interface, and browsing the Nix store. It's the standard choice for anyone working with NixOS or Nix package definitions in Emacs.
 
+The formatter hook calls =nix-format-buffer= (backed by =nixfmt= or whatever formatter =nix-format-buffer= is configured to use) on every save, consistent with the rustfmt and clang-format approach elsewhere.
+
+The =nixd= block registers it as the LSP server for =nix-mode=. =nixd= understands flakes and =nixpkgs= option types, giving far better completions and diagnostics than the older =nil= server. It must be present on =PATH= — add it to your NixOS packages or project devShell.
+
 #+begin_src emacs-lisp
 
   (use-package nix-mode
     :straight t
-    :mode "\\.nix\\'")
+    :mode "\\.nix\\'"
+    :hook
+    (nix-mode . (lambda ()
+                  (add-hook 'before-save-hook #'nix-format-buffer nil t))))
+
+  ;; Register nixd as the LSP server for Nix.  nixd must be on PATH
+  ;; (add it to your NixOS packages or devShell).
+  (with-eval-after-load 'lsp-mode
+    (add-to-list 'lsp-language-id-configuration '(nix-mode . "nix"))
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-stdio-connection '("nixd"))
+      :major-modes '(nix-mode)
+      :server-id 'nixd)))
+
+#+end_src
+
+
+** c-ts-mode / c++-ts-mode
+
+Emacs 29 ships built-in tree-sitter-based major modes for C and C++. Remapping =c-mode= → =c-ts-mode= and =c++-mode= → =c++-ts-mode= via =major-mode-remap-alist= gives significantly better syntax highlighting — including C++20 concepts, ranges, and coroutines — and enables structural navigation and text-objects built on the parse tree.
+
+Prerequisites: the C and C++ tree-sitter grammars must be compiled and available. On NixOS add =pkgs.tree-sitter-grammars.tree-sitter-c= and =tree-sitter-cpp= to your packages, or run =M-x treesit-install-language-grammar= for =c= and =cpp= on first use.
+
+#+begin_src emacs-lisp
+
+  (when (treesit-available-p)
+    (add-to-list 'major-mode-remap-alist '(c-mode   . c-ts-mode))
+    (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode)))
 
 #+end_src
 
@@ -1028,6 +1094,13 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
   (use-package lsp-ui
     :straight t
     :after lsp-mode
+    :custom
+    (lsp-ui-doc-enable t)
+    (lsp-ui-doc-show-with-cursor nil)      ; only on explicit hover, not constantly
+    (lsp-ui-doc-show-with-mouse t)
+    (lsp-ui-sideline-show-diagnostics t)
+    (lsp-ui-sideline-show-hover nil)       ; too noisy with rust-analyzer
+    (lsp-ui-sideline-show-code-actions t)
     :commands lsp-ui-mode)
 
 #+end_src
@@ -1066,6 +1139,19 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
 #+end_src
 
 
+** cmake-font-lock
+
+[[https://github.com/Lindydancer/cmake-font-lock][cmake-font-lock]] extends cmake-mode's default syntax highlighting with more detailed fontification — function arguments, generator expressions, variables, and CMake property names — making CMakeLists.txt files significantly easier to read.
+
+#+begin_src emacs-lisp
+
+  (use-package cmake-font-lock
+    :straight t
+    :hook (cmake-mode . cmake-font-lock-activate))
+
+#+end_src
+
+
 ** clang-format
 
 [[https://clang.llvm.org/docs/ClangFormat.html][clang-format]] is LLVM's opinionated C/C++/ObjC formatter — the C++ equivalent of =rustfmt=. This hook runs it on every save, keeping style consistent without manual intervention. The style is picked up from the nearest =.clang-format= file; fall back to ="LLVM"= if none exists.
@@ -1075,21 +1161,35 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
   (use-package clang-format
     :straight t
     :hook
-    ((c-mode   . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))
-     (c++-mode . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))))
+    ((c-ts-mode   . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))
+     (c++-ts-mode . (lambda () (add-hook 'before-save-hook #'clang-format-buffer nil t)))))
 
 #+end_src
 
 
 ** modern-cpp-font-lock
 
-[[https://github.com/ludwigpacifici/modern-cpp-font-lock][modern-cpp-font-lock]] extends Emacs' built-in C++ syntax highlighting with keywords from C++11 through C++20 that the default font-lock rules miss: =concept=, =requires=, =co_await=, =co_yield=, =co_return=, =consteval=, =constinit=, and many others.
+[[https://github.com/ludwigpacifici/modern-cpp-font-lock][modern-cpp-font-lock]] extends Emacs' built-in C++ syntax highlighting with keywords from C++11 through C++20 that the default font-lock rules miss: =concept=, =requires=, =co_await=, =co_yield=, =co_return=, =consteval=, =constinit=, and many others. With =c++-ts-mode= the tree-sitter grammar handles most of these, but this package catches any remaining gaps.
 
 #+begin_src emacs-lisp
 
   (use-package modern-cpp-font-lock
     :straight t
-    :hook (c++-mode . modern-c++-font-lock-mode))
+    :hook (c++-ts-mode . modern-c++-font-lock-mode))
+
+#+end_src
+
+
+** disaster
+
+[[https://github.com/jart/disaster][disaster]] lets you view the disassembled assembly for the C/C++ function at point, opening a split buffer with the annotated asm. It is invaluable for performance analysis and understanding exactly what the compiler produces — without leaving Emacs.
+
+#+begin_src emacs-lisp
+
+  (use-package disaster
+    :straight t
+    :bind (:map c++-ts-mode-map ("C-c d" . disaster)
+           :map c-ts-mode-map   ("C-c d" . disaster)))
 
 #+end_src
 
@@ -1100,6 +1200,9 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
 
   ;; Colored cargo / cmake / make output in *compilation* buffers
   (add-hook 'compilation-filter-hook #'ansi-color-compilation-filter)
+
+  ;; Scroll to the first error; stop auto-scrolling after that
+  (setq compilation-scroll-output 'first-error)
 
   ;; Toggle between .h/.cpp (or .h/.c) without leaving the keyboard
   (global-set-key (kbd "C-c o") #'ff-find-other-file)
@@ -1492,7 +1595,17 @@ TODO: https://robert.kra.hn/posts/rust-emacs-setup/
      lsp-rust-analyzer-cargo-load-out-dirs-from-check   t
 
      ;; code lenses above fn/test/impl: "Run | Debug | NN references"
-     lsp-rust-analyzer-lens-enable                t))
+     lsp-rust-analyzer-lens-enable                t
+
+     ;; search all symbols, not just exported ones
+     lsp-rust-analyzer-workspace-symbol-search-kind "all_symbols"
+
+     ;; check all targets (bins, tests, examples, benchmarks)
+     lsp-rust-analyzer-cargo-all-targets            t
+
+     ;; add call parentheses and argument snippets on completion
+     lsp-rust-analyzer-completion-add-call-parenthesis        t
+     lsp-rust-analyzer-completion-add-call-argument-snippets  t))
 
 #+end_src
 
