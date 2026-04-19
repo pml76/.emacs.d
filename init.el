@@ -661,7 +661,7 @@
   :straight t
   :custom
   (lsp-completion-provider :none) ;; we use Corfu!
-  (lsp-inlay-hint-enable t)
+  ;; (lsp-inlay-hint-enable t)
   :init
   (setq lsp-keymap-prefix "C-c C-l")
 

@@ -941,7 +941,7 @@ It integrates well with the rest of the Emacs ecosystem — Treemacs, Consult, P
     :straight t
     :custom
     (lsp-completion-provider :none) ;; we use Corfu!
-    (lsp-inlay-hint-enable t)
+    ;; (lsp-inlay-hint-enable t)
     :init
     (setq lsp-keymap-prefix "C-c C-l")
 
