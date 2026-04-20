@@ -1056,7 +1056,10 @@ The =nixd= block registers it as the LSP server for =nix-mode=. =nixd= understan
     :mode "\\.nix\\'"
     :hook
     (nix-mode . (lambda ()
-                  (add-hook 'before-save-hook #'nix-format-buffer nil t))))
+                  (add-hook 'before-save-hook #'nix-format-buffer nil t)
+                  ;; nixd does not implement textDocument/inlayHint; suppress
+                  ;; the "server does not support method" warning
+                  (lsp-inlay-hints-mode -1))))
 
   ;; Register nixd as the LSP server for Nix.  nixd must be on PATH
   ;; (add it to your NixOS packages or devShell).
