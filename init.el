@@ -688,6 +688,7 @@
    (c++-ts-mode . lsp)
    (c-ts-mode . lsp)
    (nix-mode . lsp)
+   (haskell-mode . lsp)
    (lsp-mode . lsp-enable-which-key-integration))
   :commands (lsp lsp-deferred))
 
@@ -752,8 +753,9 @@
 
 
 (when (treesit-available-p)
-  (add-to-list 'major-mode-remap-alist '(c-mode   . c-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode)))
+  (add-to-list 'major-mode-remap-alist '(c-mode      . c-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c++-mode    . c++-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(haskell-mode . haskell-ts-mode)))
 
 
 
@@ -1324,12 +1326,24 @@
   :hook
   ((haskell-mode . interactive-haskell-mode)   ; GHCi REPL integration
    (haskell-mode . haskell-indentation-mode)
-   (haskell-mode . flymake-mode))
+   (haskell-mode . flymake-mode)
+   ;; disable flycheck — HLS sends diagnostics via LSP/flymake; two competing
+   ;; diagnostic UIs produce duplicate messages (same suppression as rustic-mode)
+   (haskell-mode . (lambda () (flycheck-mode -1)))
+   ;; format on save via HLS (uses whichever provider lsp-haskell-formatting-provider names)
+   (haskell-mode . (lambda ()
+                     (add-hook 'before-save-hook #'lsp-format-buffer nil t))))
   :custom
   (haskell-process-type 'auto)                  ; auto-detect cabal/stack/ghci
   (haskell-interactive-popup-errors nil)        ; let flymake/lsp handle errors
   (haskell-process-suggest-remove-import-lines t)
-  (haskell-process-auto-import-loaded-modules t))
+  (haskell-process-auto-import-loaded-modules t)
+  :bind (:map haskell-mode-map
+              ("C-c C-l" . haskell-process-load-file)
+              ("C-c C-r" . haskell-process-reload)
+              ("C-c C-z" . haskell-interactive-switch)
+              ("C-c C-t" . lsp-describe-thing-at-point)
+              ("C-c C-d" . lsp-ui-doc-glance)))
 
 (use-package lsp-haskell
   :straight t
@@ -1338,6 +1352,21 @@
   :custom
   ;; haskell-language-server-wrapper picks the right HLS for the GHC version
   (lsp-haskell-server-path "haskell-language-server-wrapper"))
+
+;; Tune HLS plugins — mirrors the rust-analyzer block above
+(with-eval-after-load 'lsp-haskell
+  (setq
+   ;; formatter: ormolu is strict/reproducible; swap for "fourmolu" or
+   ;; "stylish-haskell" if your project uses a different convention
+   lsp-haskell-formatting-provider                    "ormolu"
+   ;; surface hlint hints as LSP diagnostics
+   lsp-haskell-plugin-hlint-diagnostic-on             t
+   ;; show inferred types as code lenses above top-level definitions
+   lsp-haskell-plugin-ghcide-type-lenses-config-mode  "always"
+   ;; offer import-organisation code actions (add/remove/sort imports)
+   lsp-haskell-plugin-import-lens-code-actions-on     t
+   ;; evaluate Haddock examples (=doctest= style) via the eval plugin
+   lsp-haskell-plugin-eval-global-on                  t))
 
 
 

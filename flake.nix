@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    
+
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -13,107 +13,138 @@
       url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
+
   };
 
-  outputs = { self, nixpkgs, emacs-overlay, claude-code }: let
-    pkgs = import nixpkgs {
-      system = "x86_64-linux";
-      config = { allowUnfree = true; };
-      overlays = [ (import emacs-overlay) ];
+  outputs =
+    {
+      self,
+      nixpkgs,
+      emacs-overlay,
+      claude-code,
+    }:
+    let
+      pkgs = import nixpkgs {
+        system = "x86_64-linux";
+        config = {
+          allowUnfree = true;
+        };
+        overlays = [ (import emacs-overlay) ];
+      };
+
+      # Treesitter grammars for Emacs built-in treesit.
+      # The .so files land in $out/lib/; point treesit-extra-load-path there.
+      treesit-grammars = (pkgs.emacsPackagesFor pkgs.emacs-unstable-pgtk).treesit-grammars.with-grammars (
+        g: with g; [
+          tree-sitter-c
+          tree-sitter-cpp
+          tree-sitter-haskell
+        ]
+      );
+
+      emacs-additional-packages =
+        with pkgs;
+        [
+          # gcc
+
+          # used by emacs
+          ripgrep
+
+          # used to handle rust projects
+          rustup
+
+          # used by emacs for c++ development
+          clang
+          ninja
+          gnumake
+          libtool
+          lldb
+          clang-tools
+          cmakeWithGui
+          gdb
+          semgrep
+          python3
+
+          # used by emacs for nix development
+          nixd
+          nixfmt # called by nix-mode's nix-format-buffer
+
+          # used by the emacs package 'jinx', the spell checker
+          enchant
+          hunspell
+          hunspellDicts.en_US-large # or en_US for a smaller wordlist
+          hunspellDicts.de_DE # German
+          pkgconf
+
+          # latex
+          texlab
+          texlive.combined.scheme-full
+
+          # used by emacs for cmake development
+          cmake-language-server
+
+          # claude code for testing ...
+          claude-code.packages.${stdenv.hostPlatform.system}.claude-code
+
+          # haskell support
+          ghc
+          haskell-language-server
+          stack
+          ormolu # formatter (lsp-haskell-formatting-provider)
+          hlint # linter (surfaced via HLS hlint plugin)
+
+          # project environment isolation (envrc package)
+          direnv
+
+          # treesitter grammars (c, cpp, haskell) for Emacs built-in treesit
+          # add ${treesit-grammars}/lib to treesit-extra-load-path in emacs.org
+          treesit-grammars
+
+          # fonts
+          noto-fonts
+          noto-fonts-cjk-sans
+          noto-fonts-color-emoji
+          liberation_ttf
+          fira-code
+          fira-code-symbols
+          mplus-outline-fonts.githubRelease
+          dina-font
+          cantarell-fonts
+          #    all-the-icons
+          emacs-all-the-icons-fonts
+          jetbrains-mono
+
+          # some stand fonts
+          corefonts
+          vista-fonts
+
+          source-serif
+          source-sans
+          source-code-pro
+
+        ] # nerd-fonts
+        ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+    in
+    {
+
+      claude-code = claude-code;
+
+      emacs-init-el = ./init.el;
+      emacs-early-init-el = ./early-init.el;
+
+      emacs = pkgs.emacs-unstable-pgtk;
+
+      emacs-additional-packages = emacs-additional-packages;
+
+      devShells.x86_64-linux.default = pkgs.mkShell {
+
+        buildInputs =
+          with pkgs;
+          [
+            emacs-unstable-pgtk
+          ]
+          ++ emacs-additional-packages;
+      };
     };
-
-    emacs-additional-packages = with pkgs; [
-      # gcc
-      
-      # used by emacs
-      ripgrep
-
-      # used to handle rust projects
-      rustup
-      
-      
-      # used by emacs for c++ development
-      clang
-      ninja
-      gnumake
-      libtool
-      lldb
-      clang-tools
-      cmakeWithGui
-      gdb
-      semgrep
-      python3
-      
-      # used by emacs for nix development
-      nixd
-
-      # used by the emacs package 'jinx', the spell checker
-      enchant
-      hunspell
-      hunspellDicts.en_US-large       # or en_US for a smaller wordlist
-      hunspellDicts.de_DE             # German
-      pkgconf
-
-      # latex
-      texlab
-      texlive.combined.scheme-full
-
-
-      # used by emacs for cmake development
-      cmake-language-server
-
-      # claude code for testing ...
-      claude-code.packages.${stdenv.hostPlatform.system}.claude-code
-
-      # haskell support
-      ghc
-      haskell-language-server
-      stack
-      
-      # fonts
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-color-emoji
-      liberation_ttf
-      fira-code
-      fira-code-symbols
-      mplus-outline-fonts.githubRelease
-      dina-font
-      cantarell-fonts
-      #    all-the-icons
-      emacs-all-the-icons-fonts
-      jetbrains-mono
-
-      # some stand fonts
-      corefonts
-      vista-fonts
-
-      source-serif
-      source-sans
-      source-code-pro
-        
-    ] # nerd-fonts
-    ++ builtins.filter
-      lib.attrsets.isDerivation
-      (builtins.attrValues pkgs.nerd-fonts);  
-  in {
-
-    claude-code = claude-code;
-    
-    emacs-init-el = ./init.el;
-    emacs-early-init-el = ./early-init.el;
-
-    emacs = pkgs.emacs-unstable-pgtk;
-
-    emacs-additional-packages = emacs-additional-packages;
-    
-    devShells.x86_64-linux.default = pkgs.mkShell {
-
-      buildInputs = with pkgs; [
-        emacs-unstable-pgtk ]
-      ++ emacs-additional-packages;
-    };
-  };
 
 }
