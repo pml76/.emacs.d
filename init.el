@@ -1,6 +1,4 @@
 
-
-
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name
@@ -1085,7 +1083,17 @@
 (use-package rust-mode
   :straight t
   :init
-  (setq rust-mode-treesitter-derive t))
+  (setq rust-mode-treesitter-derive t)
+
+  ;; rust-ts-mode registers a single-file rustc flymake backend that
+  ;; produces spurious E0433 errors for every
+  ;; orkspace-relative import
+  ;; (no cargo context). lsp-mode/rust-analyzer handles diagnostics 
+  ;; remove the redundant backend.     
+  (add-hook 'rust-ts-mode-hook 
+    (lambda ()
+      (remove-hook 'flymake-diagnostic-functions
+        #'rust-ts-flymake t))))
 
 
 
