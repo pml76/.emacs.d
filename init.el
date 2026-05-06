@@ -136,6 +136,14 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+
+;; Reserve a fixed-width gutter so the buffer doesn't
+;; reflow each time the line count crosses a power-of-ten
+;;boundary (e.g. 99 → 100).                             
+(setq display-line-numbers-width-start t)
+
+
 
 (use-package smartparens
   :straight t
@@ -1086,8 +1094,7 @@
   (setq rust-mode-treesitter-derive t)
 
   ;; rust-ts-mode registers a single-file rustc flymake backend that
-  ;; produces spurious E0433 errors for every
-  ;; orkspace-relative import
+  ;; produces spurious E0433 errors for every workspace-relative import
   ;; (no cargo context). lsp-mode/rust-analyzer handles diagnostics 
   ;; remove the redundant backend.     
   (add-hook 'rust-ts-mode-hook 
